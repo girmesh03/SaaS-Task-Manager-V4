@@ -1,3 +1,6 @@
+/**
+ * @file Minimal UI state slice.
+ */
 import { createSlice } from "@reduxjs/toolkit";
 
 import { LIST_VIEW_MODES } from "../../utils/constants";

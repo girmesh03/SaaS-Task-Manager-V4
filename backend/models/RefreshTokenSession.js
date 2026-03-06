@@ -1,36 +1,42 @@
+/**
+ * @file Refresh token session model schema.
+ */
 import mongoose from "mongoose";
 
 import { toJSONPlugin } from "../plugins/toJSONPlugin.js";
 import {
+  attachSessionAwarePagination,
+  buildDateField,
+  buildReferenceField,
+  buildStringField,
   MODEL_NAMES,
   ROLE_VALUES,
-} from "../utils/constants.js";
+  SCHEMA_FIELD_LABELS,
+  SCHEMA_FIELD_LIMITS,
+} from "../utils/index.js";
 
 const refreshTokenSessionSchema = new mongoose.Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
+    user: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.REFRESH_TOKEN_SESSION.USER,
       ref: MODEL_NAMES.USER,
       required: true,
-      index: true,
-    },
-    organizationId: {
-      type: mongoose.Schema.Types.ObjectId,
+    }),
+    organization: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.REFRESH_TOKEN_SESSION.ORGANIZATION,
       ref: MODEL_NAMES.ORGANIZATION,
       required: true,
-      index: true,
-    },
-    departmentId: {
-      type: mongoose.Schema.Types.ObjectId,
+    }),
+    department: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.REFRESH_TOKEN_SESSION.DEPARTMENT,
       ref: MODEL_NAMES.DEPARTMENT,
-      default: null,
-      index: true,
-    },
-    role: {
-      type: String,
+      defaultValue: null,
+    }),
+    role: buildStringField({
+      label: SCHEMA_FIELD_LABELS.REFRESH_TOKEN_SESSION.ROLE,
       required: true,
-      enum: ROLE_VALUES,
-    },
+      enumValues: ROLE_VALUES,
+    }),
     isHod: {
       type: Boolean,
       default: false,
@@ -39,47 +45,54 @@ const refreshTokenSessionSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    tokenHash: {
-      type: String,
+    tokenHash: buildStringField({
+      label: SCHEMA_FIELD_LABELS.REFRESH_TOKEN_SESSION.TOKEN_HASH,
       required: true,
-      select: false,
-    },
-    expiresAt: {
-      type: Date,
+      maxLength: SCHEMA_FIELD_LIMITS.TOKEN_HASH_MAX_LENGTH,
+    }),
+    expiresAt: buildDateField({
+      label: SCHEMA_FIELD_LABELS.REFRESH_TOKEN_SESSION.EXPIRES_AT,
       required: true,
-      index: true,
-    },
-    revokedAt: {
-      type: Date,
-      default: null,
-      index: true,
-    },
-    replacedBySessionId: {
-      type: mongoose.Schema.Types.ObjectId,
+    }),
+    revokedAt: buildDateField({
+      label: SCHEMA_FIELD_LABELS.REFRESH_TOKEN_SESSION.REVOKED_AT,
+      defaultValue: null,
+    }),
+    replacedBySession: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.REFRESH_TOKEN_SESSION.REPLACED_BY_SESSION,
       ref: MODEL_NAMES.REFRESH_TOKEN_SESSION,
-      default: null,
-    },
-    lastUsedAt: {
-      type: Date,
-      default: null,
-    },
-    ip: {
-      type: String,
-      trim: true,
-      default: null,
-    },
-    userAgent: {
-      type: String,
-      trim: true,
-      default: null,
-    },
+      defaultValue: null,
+    }),
+    lastUsedAt: buildDateField({
+      label: SCHEMA_FIELD_LABELS.REFRESH_TOKEN_SESSION.LAST_USED_AT,
+      defaultValue: null,
+    }),
+    ip: buildStringField({
+      label: SCHEMA_FIELD_LABELS.REFRESH_TOKEN_SESSION.IP,
+      maxLength: SCHEMA_FIELD_LIMITS.IP_MAX_LENGTH,
+      defaultValue: null,
+    }),
+    userAgent: buildStringField({
+      label: SCHEMA_FIELD_LABELS.REFRESH_TOKEN_SESSION.USER_AGENT,
+      maxLength: SCHEMA_FIELD_LIMITS.USER_AGENT_MAX_LENGTH,
+      defaultValue: null,
+    }),
   },
   {
     timestamps: true,
   }
 );
 
+refreshTokenSessionSchema.path("tokenHash").select(false);
+refreshTokenSessionSchema.index({ user: 1 });
+refreshTokenSessionSchema.index({ organization: 1 });
+refreshTokenSessionSchema.index({ department: 1 });
+refreshTokenSessionSchema.index({ expiresAt: 1 });
+refreshTokenSessionSchema.index({ revokedAt: 1 });
+refreshTokenSessionSchema.index({ replacedBySession: 1 });
+
 refreshTokenSessionSchema.plugin(toJSONPlugin);
+attachSessionAwarePagination(refreshTokenSessionSchema);
 
 const RefreshTokenSession =
   mongoose.models[MODEL_NAMES.REFRESH_TOKEN_SESSION] ||

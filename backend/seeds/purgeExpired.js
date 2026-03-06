@@ -1,3 +1,5 @@
+import path from "path";
+import { fileURLToPath } from "url";
 import { connectDb, disconnectDb } from "../config/db.js";
 import { getEnv } from "../config/env.js";
 import Attachment from "../models/Attachment.js";
@@ -74,3 +76,19 @@ export const purgeExpired = async () => {
     await disconnectDb();
   }
 };
+
+const currentFilePath = fileURLToPath(import.meta.url);
+const isDirectExecution =
+  Boolean(process.argv[1]) && path.resolve(process.argv[1]) === currentFilePath;
+
+if (isDirectExecution) {
+  purgeExpired()
+    .then((result) => {
+      console.info(JSON.stringify(result, null, 2));
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error(error instanceof Error ? error.message : API_MESSAGES.INTERNAL_SERVER_ERROR);
+      process.exit(1);
+    });
+}

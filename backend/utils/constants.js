@@ -335,6 +335,147 @@ export const FILE_UPLOAD_CONSTRAINTS = Object.freeze({
   ]),
 });
 
+export const ATTACHMENT_PARENT_TYPE_VALUES = Object.freeze([
+  "Task",
+  "TaskActivity",
+  "Comment",
+]);
+
+export const ATTACHMENT_RESOURCE_TYPE_VALUES = Object.freeze([
+  "image",
+  "video",
+  "raw",
+]);
+
+export const SCHEMA_FIELD_LIMITS = Object.freeze({
+  ORGANIZATION_NAME_MAX_LENGTH: 120,
+  ORGANIZATION_DESCRIPTION_MAX_LENGTH: 500,
+  ORGANIZATION_ADDRESS_MAX_LENGTH: 240,
+  ORGANIZATION_INDUSTRY_MAX_LENGTH: 120,
+  DEPARTMENT_NAME_MAX_LENGTH: 120,
+  DEPARTMENT_DESCRIPTION_MAX_LENGTH: 500,
+  USER_FIRST_NAME_MAX_LENGTH: 60,
+  USER_LAST_NAME_MAX_LENGTH: 60,
+  USER_FULL_NAME_MAX_LENGTH: 121,
+  USER_POSITION_MAX_LENGTH: 120,
+  EMAIL_MAX_LENGTH: 254,
+  PHONE_MAX_LENGTH: 20,
+  URL_MAX_LENGTH: 2048,
+  NOTIFICATION_TYPE_MAX_LENGTH: 80,
+  NOTIFICATION_TITLE_MAX_LENGTH: 160,
+  NOTIFICATION_MESSAGE_MAX_LENGTH: 500,
+  ENTITY_TYPE_MAX_LENGTH: 120,
+  ENTITY_ID_MAX_LENGTH: 120,
+  FILE_NAME_MAX_LENGTH: 255,
+  PUBLIC_ID_MAX_LENGTH: 255,
+  TOKEN_HASH_MAX_LENGTH: 255,
+  IP_MAX_LENGTH: 64,
+  USER_AGENT_MAX_LENGTH: 512,
+});
+
+export const SCHEMA_FIELD_LABELS = Object.freeze({
+  SOFT_DELETE: Object.freeze({
+    DELETED_BY: "Deleted by user",
+  }),
+  ORGANIZATION: Object.freeze({
+    NAME: "Organization name",
+    DESCRIPTION: "Organization description",
+    EMAIL: "Organization email",
+    PHONE: "Organization phone",
+    ADDRESS: "Organization address",
+    WEBSITE: "Organization website",
+    INDUSTRY: "Organization industry",
+    SIZE: "Organization size",
+    IS_PLATFORM_ORG: "Platform organization flag",
+    IS_ACTIVE: "Organization active status",
+  }),
+  DEPARTMENT: Object.freeze({
+    ORGANIZATION: "Department organization",
+    NAME: "Department name",
+    DESCRIPTION: "Department description",
+    MANAGER: "Department manager",
+    IS_ACTIVE: "Department active status",
+  }),
+  USER: Object.freeze({
+    ORGANIZATION: "User organization",
+    DEPARTMENT: "User department",
+    FIRST_NAME: "User first name",
+    LAST_NAME: "User last name",
+    FULL_NAME: "User full name",
+    POSITION: "User position",
+    EMAIL: "User email",
+    PHONE: "User phone",
+    ROLE: "User role",
+    IS_HOD: "Head of department flag",
+    IS_PLATFORM_ORG_USER: "Platform organization user flag",
+    IS_VERIFIED: "User verification status",
+    IS_ACTIVE: "User active status",
+    AVATAR_URL: "User avatar URL",
+    PASSWORD_HASH: "Password hash",
+    PASSWORD_HISTORY_HASHES: "Password history hashes",
+    JOINED_AT: "User joined date",
+  }),
+  NOTIFICATION: Object.freeze({
+    USER: "Notification user",
+    ORGANIZATION: "Notification organization",
+    DEPARTMENT: "Notification department",
+    TYPE: "Notification type",
+    TITLE: "Notification title",
+    MESSAGE: "Notification message",
+    ROUTE: "Notification route",
+    ENTITY_TYPE: "Notification entity type",
+    ENTITY_ID: "Notification entity id",
+    IS_READ: "Notification read status",
+    EXPIRES_AT: "Notification expiry date",
+  }),
+  ATTACHMENT: Object.freeze({
+    ORGANIZATION: "Attachment organization",
+    DEPARTMENT: "Attachment department",
+    CREATED_BY: "Attachment creator",
+    PARENT_TYPE: "Attachment parent type",
+    PARENT_ID: "Attachment parent id",
+    FILE_NAME: "Attachment file name",
+    EXTENSION: "Attachment extension",
+    RESOURCE_TYPE: "Attachment resource type",
+    PUBLIC_ID: "Attachment public id",
+    SECURE_URL: "Attachment secure URL",
+    BYTES: "Attachment size",
+    EXPIRES_AT: "Attachment expiry date",
+  }),
+  REFRESH_TOKEN_SESSION: Object.freeze({
+    USER: "Refresh session user",
+    ORGANIZATION: "Refresh session organization",
+    DEPARTMENT: "Refresh session department",
+    ROLE: "Refresh session role",
+    IS_HOD: "Refresh session head of department flag",
+    IS_PLATFORM_ORG_USER: "Refresh session platform organization user flag",
+    TOKEN_HASH: "Refresh session token hash",
+    EXPIRES_AT: "Refresh session expiry date",
+    REVOKED_AT: "Refresh session revoked date",
+    REPLACED_BY_SESSION: "Refresh session replacement session",
+    LAST_USED_AT: "Refresh session last used date",
+    IP: "Refresh session IP address",
+    USER_AGENT: "Refresh session user agent",
+  }),
+});
+
+export const SCHEMA_VALIDATION_PATTERNS = Object.freeze({
+  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  PHONE: /^(?:\+2519\d{8}|09\d{8})$/,
+});
+
+export const URL_PROTOCOL_VALUES = Object.freeze(["http:", "https:"]);
+
+export const SCHEMA_INDEX_FILTERS = Object.freeze({
+  NOT_DELETED: Object.freeze({
+    isDeleted: { $ne: true },
+  }),
+  NOT_DELETED_WITH_EMAIL: Object.freeze({
+    isDeleted: { $ne: true },
+    email: { $exists: true, $type: "string", $ne: "" },
+  }),
+});
+
 export const MODEL_NAMES = Object.freeze({
   ORGANIZATION: "Organization",
   DEPARTMENT: "Department",

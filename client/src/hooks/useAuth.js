@@ -3,29 +3,40 @@ import { useNavigate } from "react-router";
 
 import { apiSlice } from "../api/apiSlice";
 import { disconnectSocket } from "../api/socketClient";
-import { clearActor } from "../app/slices/authSlice";
+import { clearUser } from "../app/slices/authSlice";
 
 /**
- * Reads actor auth state and provides a logout helper.
+ * Reads user auth state and provides a logout helper.
  *
- * @returns {{ actor: Record<string, unknown> | null, isAuthenticated: boolean, logout: () => void }} Auth state and helpers.
+ * @returns {{ user: Record<string, unknown> | null, isAuthenticated: boolean, logout: () => Promise<void> }} Auth state and helpers.
  * @throws {never} This hook does not throw.
  */
 export const useAuth = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const actor = useSelector((state) => state.auth.actor);
+  const user = useSelector((state) => state.auth.user);
 
-  const logout = () => {
-    dispatch(clearActor());
-    dispatch(apiSlice.util.resetApiState());
+  const logout = async () => {
+    try {
+      await dispatch(apiSlice.endpoints.logout.initiate()).unwrap();
+    } catch {
+      // Logout still clears local state when the server session is already gone.
+    }
+
     disconnectSocket();
-    navigate("/login");
+    dispatch(clearUser());
+    dispatch(apiSlice.util.resetApiState());
+    void dispatch(
+      apiSlice.endpoints.getCsrfToken.initiate(undefined, {
+        forceRefetch: true,
+      })
+    );
+    navigate("/login", { replace: true });
   };
 
   return {
-    actor,
-    isAuthenticated: Boolean(actor?.id || actor?.userId),
+    user,
+    isAuthenticated: Boolean(user?._id),
     logout,
   };
 };

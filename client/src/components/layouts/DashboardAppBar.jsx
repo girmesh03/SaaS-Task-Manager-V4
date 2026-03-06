@@ -32,7 +32,7 @@ import UserMenu from "./UserMenu";
  *   notificationsDisabled?: boolean;
  *   onViewAllNotifications?: () => void;
  *   user: {
- *     id: string | null;
+ *     _id: string | null;
  *     fullName: string;
  *     email: string;
  *     avatarUrl: string;
@@ -143,7 +143,7 @@ const DashboardAppBar = ({
 
         <UserMenu
           user={{
-            id: user?.id || null,
+            _id: user?._id || null,
             fullName: user?.fullName || "",
             email: user?.email || "",
             avatarUrl: user?.avatarUrl || "",

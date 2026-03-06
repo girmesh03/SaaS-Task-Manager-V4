@@ -1,7 +1,15 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-import { clearActor } from "../app/slices/authSlice";
+import {
+  AUTH_COOKIE_NAMES,
+  AUTH_HEADER_NAMES,
+  ERROR_TYPES,
+} from "../utils/constants";
+import {
+  clearUser,
+  setUser,
+} from "../app/slices/authSlice";
 import { disconnectSocket } from "./socketClient";
 
 const readCookie = (name) => {
@@ -39,10 +47,10 @@ export const axiosBaseQuery =
       responseType: config.responseType,
       withCredentials: true,
     };
-    const csrfToken = readCookie("csrfToken");
+    const csrfToken = readCookie(AUTH_COOKIE_NAMES.CSRF_TOKEN);
 
-    if (csrfToken && !request.headers["x-csrf-token"]) {
-      request.headers["x-csrf-token"] = csrfToken;
+    if (csrfToken && !request.headers[AUTH_HEADER_NAMES.CSRF]) {
+      request.headers[AUTH_HEADER_NAMES.CSRF] = csrfToken;
     }
 
     try {
@@ -61,7 +69,7 @@ export const axiosBaseQuery =
         success: false,
         message: error.message || "Request failed.",
         error: {
-          type: "INTERNAL_ERROR",
+          type: ERROR_TYPES.INTERNAL_ERROR,
           statusCode: status || 500,
         },
         details: [],
@@ -69,17 +77,18 @@ export const axiosBaseQuery =
 
       if (status === 401 && !config._retried && request.url !== "/auth/refresh") {
         try {
-          await axios({
+          const refreshResult = await axios({
             baseURL: baseUrl,
             url: "/auth/refresh",
             method: "POST",
-            headers: csrfToken
-              ? {
-                  "x-csrf-token": csrfToken,
+              headers: csrfToken
+                ? {
+                  [AUTH_HEADER_NAMES.CSRF]: csrfToken,
                 }
               : undefined,
             withCredentials: true,
           });
+          api.dispatch(setUser(refreshResult.data?.user || null));
 
           return axiosBaseQuery({ baseUrl })(
             {
@@ -89,8 +98,18 @@ export const axiosBaseQuery =
             api
           );
         } catch {
-          api.dispatch(clearActor());
+          api.dispatch(clearUser());
           disconnectSocket();
+          try {
+            await axios({
+              baseURL: baseUrl,
+              url: "/auth/csrf",
+              method: "GET",
+              withCredentials: true,
+            });
+          } catch {
+            // Best effort only; root layout also bootstraps CSRF on mount.
+          }
 
           if (typeof window !== "undefined" && window.location.pathname !== "/login") {
             window.location.assign("/login");

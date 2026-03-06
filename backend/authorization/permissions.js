@@ -1,3 +1,6 @@
+/**
+ * @file Central backend authorization permission matrix.
+ */
 import {
   PERMISSION_ACTIONS,
   PERMISSION_RESOURCES,

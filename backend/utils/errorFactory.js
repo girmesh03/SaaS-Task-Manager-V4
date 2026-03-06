@@ -39,6 +39,7 @@ export const createError = ({ type, statusCode, message, details = [] }) =>
  * Throws a canonical validation error.
  *
  * @param {Array<Record<string, unknown>>} details - Validation detail items.
+ * @returns {never} This helper always throws.
  * @throws {AppError} Always throws a validation error.
  */
 export const throwValidationError = (details) => {
@@ -54,6 +55,7 @@ export const throwValidationError = (details) => {
  * Throws a canonical unauthenticated error.
  *
  * @param {string} [message=API_MESSAGES.UNAUTHENTICATED] - Optional override message.
+ * @returns {never} This helper always throws.
  * @throws {AppError} Always throws an unauthenticated error.
  */
 export const throwUnauthenticatedError = (
@@ -71,6 +73,7 @@ export const throwUnauthenticatedError = (
  *
  * @param {string} [message=API_MESSAGES.UNAUTHORIZED] - Optional override message.
  * @param {Array<Record<string, unknown>>} [details=[]] - Optional details.
+ * @returns {never} This helper always throws.
  * @throws {AppError} Always throws an unauthorized error.
  */
 export const throwUnauthorizedError = (
@@ -89,6 +92,7 @@ export const throwUnauthorizedError = (
  * Throws a canonical not-found error.
  *
  * @param {string} [message=API_MESSAGES.NOT_FOUND] - Optional override message.
+ * @returns {never} This helper always throws.
  * @throws {AppError} Always throws a not-found error.
  */
 export const throwNotFoundError = (message = API_MESSAGES.NOT_FOUND) => {
@@ -104,6 +108,7 @@ export const throwNotFoundError = (message = API_MESSAGES.NOT_FOUND) => {
  *
  * @param {string} [message=API_MESSAGES.UNAUTHORIZED] - Optional override message.
  * @param {Array<Record<string, unknown>>} [details=[]] - Optional details.
+ * @returns {never} This helper always throws.
  * @throws {AppError} Always throws a conflict error.
  */
 export const throwConflictError = (
@@ -122,6 +127,7 @@ export const throwConflictError = (
  * Throws a canonical rate-limited error.
  *
  * @param {string} [message=API_MESSAGES.RATE_LIMITED] - Optional override message.
+ * @returns {never} This helper always throws.
  * @throws {AppError} Always throws a rate-limited error.
  */
 export const throwRateLimitedError = (
@@ -138,6 +144,7 @@ export const throwRateLimitedError = (
  * Throws a canonical internal error.
  *
  * @param {string} [message=API_MESSAGES.INTERNAL_SERVER_ERROR] - Optional override message.
+ * @returns {never} This helper always throws.
  * @throws {AppError} Always throws an internal error.
  */
 export const throwInternalError = (

@@ -7,16 +7,16 @@ import {
 } from "../utils/authorization";
 
 const scopeChecks = Object.freeze({
-  organization: ({ actor, context }) =>
-    authorizationPredicates.isSameOrganization({ actor, context }),
-  department: ({ actor, context }) =>
-    authorizationPredicates.isSameOrganization({ actor, context }) &&
-    authorizationPredicates.isSameDepartment({ actor, context }),
+  organization: ({ user, context }) =>
+    authorizationPredicates.isSameOrganization({ user, context }),
+  department: ({ user, context }) =>
+    authorizationPredicates.isSameOrganization({ user, context }) &&
+    authorizationPredicates.isSameDepartment({ user, context }),
 });
 
 const ownershipChecks = Object.freeze({
-  self: ({ actor, context }) =>
-    authorizationPredicates.isSelf({ actor, context }),
+  self: ({ user, context }) =>
+    authorizationPredicates.isSelf({ user, context }),
 });
 
 /**
@@ -26,7 +26,7 @@ const ownershipChecks = Object.freeze({
  * @throws {never} This hook does not throw.
  */
 export const useAuthorization = () => {
-  const { actor } = useAuth();
+  const { user } = useAuth();
 
   return useMemo(
     () => ({
@@ -34,14 +34,14 @@ export const useAuthorization = () => {
         const rules = permissionMatrix[resource]?.[action] || [];
 
         return rules.some((rule) => {
-          if (!rule.roles?.includes(actor?.role)) {
+          if (!rule.roles?.includes(user?.role)) {
             return false;
           }
 
           if (
             (rule.predicates || []).some((predicateName) => {
               const predicate = authorizationPredicates[predicateName];
-              return typeof predicate !== "function" || !predicate({ actor, context });
+              return typeof predicate !== "function" || !predicate({ user, context });
             })
           ) {
             return false;
@@ -50,7 +50,7 @@ export const useAuthorization = () => {
           if (
             rule.scope &&
             typeof scopeChecks[rule.scope] === "function" &&
-            !scopeChecks[rule.scope]({ actor, context })
+            !scopeChecks[rule.scope]({ user, context })
           ) {
             return false;
           }
@@ -58,7 +58,7 @@ export const useAuthorization = () => {
           if (
             rule.ownership &&
             typeof ownershipChecks[rule.ownership] === "function" &&
-            !ownershipChecks[rule.ownership]({ actor, context })
+            !ownershipChecks[rule.ownership]({ user, context })
           ) {
             return false;
           }
@@ -69,14 +69,14 @@ export const useAuthorization = () => {
       whyNot(resource, action, context = {}) {
         const rules = permissionMatrix[resource]?.[action] || [];
         const allowed = rules.some((rule) => {
-          if (!rule.roles?.includes(actor?.role)) {
+          if (!rule.roles?.includes(user?.role)) {
             return false;
           }
 
           if (
             (rule.predicates || []).some((predicateName) => {
               const predicate = authorizationPredicates[predicateName];
-              return typeof predicate !== "function" || !predicate({ actor, context });
+              return typeof predicate !== "function" || !predicate({ user, context });
             })
           ) {
             return false;
@@ -85,7 +85,7 @@ export const useAuthorization = () => {
           if (
             rule.scope &&
             typeof scopeChecks[rule.scope] === "function" &&
-            !scopeChecks[rule.scope]({ actor, context })
+            !scopeChecks[rule.scope]({ user, context })
           ) {
             return false;
           }
@@ -93,7 +93,7 @@ export const useAuthorization = () => {
           if (
             rule.ownership &&
             typeof ownershipChecks[rule.ownership] === "function" &&
-            !ownershipChecks[rule.ownership]({ actor, context })
+            !ownershipChecks[rule.ownership]({ user, context })
           ) {
             return false;
           }
@@ -106,6 +106,6 @@ export const useAuthorization = () => {
           : "You do not have permission to do that.";
       },
     }),
-    [actor]
+    [user]
   );
 };

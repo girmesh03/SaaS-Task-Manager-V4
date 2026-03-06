@@ -2,6 +2,7 @@ import { validationResult } from "express-validator";
 
 import { createError } from "../utils/errorFactory.js";
 import {
+  API_MESSAGES,
   API_STATUS_CODES,
   ERROR_TYPES,
 } from "../utils/constants.js";
@@ -30,7 +31,7 @@ export const validateRequest = (validations = []) => {
         createError({
           type: ERROR_TYPES.VALIDATION_ERROR,
           statusCode: API_STATUS_CODES.BAD_REQUEST,
-          message: "Validation failed.",
+          message: API_MESSAGES.VALIDATION_FAILED,
           details: result.array().map((issue) => ({
             field: issue.type === "field" ? issue.path : "request",
             message: issue.msg,

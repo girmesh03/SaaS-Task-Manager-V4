@@ -1,3 +1,6 @@
+/**
+ * @file Express application bootstrap and middleware order.
+ */
 import express from "express";
 import compression from "compression";
 import cookieParser from "cookie-parser";

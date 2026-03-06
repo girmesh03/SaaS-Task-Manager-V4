@@ -1,84 +1,101 @@
+/**
+ * @file Attachment model schema.
+ */
 import mongoose from "mongoose";
 
 import { softDeletePlugin } from "../plugins/softDeletePlugin.js";
 import { toJSONPlugin } from "../plugins/toJSONPlugin.js";
 import {
+  attachSessionAwarePagination,
+  buildDateField,
+  buildNumberField,
+  buildReferenceField,
+  buildStringField,
+  buildUrlField,
+  ATTACHMENT_PARENT_TYPE_VALUES,
+  ATTACHMENT_RESOURCE_TYPE_VALUES,
   MODEL_NAMES,
   FILE_UPLOAD_CONSTRAINTS,
-} from "../utils/constants.js";
+  SCHEMA_FIELD_LABELS,
+  SCHEMA_FIELD_LIMITS,
+} from "../utils/index.js";
 
 const attachmentSchema = new mongoose.Schema(
   {
-    organizationId: {
-      type: mongoose.Schema.Types.ObjectId,
+    organization: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.ATTACHMENT.ORGANIZATION,
       ref: MODEL_NAMES.ORGANIZATION,
       required: true,
-      index: true,
-    },
-    departmentId: {
-      type: mongoose.Schema.Types.ObjectId,
+    }),
+    department: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.ATTACHMENT.DEPARTMENT,
       ref: MODEL_NAMES.DEPARTMENT,
-      default: null,
-      index: true,
-    },
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
+      defaultValue: null,
+    }),
+    createdBy: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.ATTACHMENT.CREATED_BY,
       ref: MODEL_NAMES.USER,
-      default: null,
-    },
-    parentType: {
-      type: String,
+      defaultValue: null,
+    }),
+    parentType: buildStringField({
+      label: SCHEMA_FIELD_LABELS.ATTACHMENT.PARENT_TYPE,
       required: true,
-      enum: ["Task", "TaskActivity", "Comment"],
-    },
-    parentId: {
-      type: String,
+      enumValues: ATTACHMENT_PARENT_TYPE_VALUES,
+    }),
+    parentId: buildStringField({
+      label: SCHEMA_FIELD_LABELS.ATTACHMENT.PARENT_ID,
       required: true,
-    },
-    fileName: {
-      type: String,
+      maxLength: SCHEMA_FIELD_LIMITS.ENTITY_ID_MAX_LENGTH,
+    }),
+    fileName: buildStringField({
+      label: SCHEMA_FIELD_LABELS.ATTACHMENT.FILE_NAME,
       required: true,
-      trim: true,
-    },
-    extension: {
-      type: String,
+      maxLength: SCHEMA_FIELD_LIMITS.FILE_NAME_MAX_LENGTH,
+    }),
+    extension: buildStringField({
+      label: SCHEMA_FIELD_LABELS.ATTACHMENT.EXTENSION,
       required: true,
       lowercase: true,
-      enum: FILE_UPLOAD_CONSTRAINTS.ALLOWED_EXTENSIONS,
-    },
-    resourceType: {
-      type: String,
+      enumValues: FILE_UPLOAD_CONSTRAINTS.ALLOWED_EXTENSIONS,
+    }),
+    resourceType: buildStringField({
+      label: SCHEMA_FIELD_LABELS.ATTACHMENT.RESOURCE_TYPE,
       required: true,
-      enum: ["image", "video", "raw"],
-    },
-    publicId: {
-      type: String,
+      enumValues: ATTACHMENT_RESOURCE_TYPE_VALUES,
+    }),
+    publicId: buildStringField({
+      label: SCHEMA_FIELD_LABELS.ATTACHMENT.PUBLIC_ID,
       required: true,
-      trim: true,
-    },
-    secureUrl: {
-      type: String,
+      maxLength: SCHEMA_FIELD_LIMITS.PUBLIC_ID_MAX_LENGTH,
+    }),
+    secureUrl: buildUrlField({
+      label: SCHEMA_FIELD_LABELS.ATTACHMENT.SECURE_URL,
       required: true,
-      trim: true,
-    },
-    bytes: {
-      type: Number,
+    }),
+    bytes: buildNumberField({
+      label: SCHEMA_FIELD_LABELS.ATTACHMENT.BYTES,
       required: true,
-      min: 0,
-      max: FILE_UPLOAD_CONSTRAINTS.MAX_SIZE_BYTES,
-    },
-    expiresAt: {
-      type: Date,
+      minValue: 0,
+      maxValue: FILE_UPLOAD_CONSTRAINTS.MAX_SIZE_BYTES,
+    }),
+    expiresAt: buildDateField({
+      label: SCHEMA_FIELD_LABELS.ATTACHMENT.EXPIRES_AT,
       required: true,
-      index: true,
-    },
+    }),
   },
   {
     timestamps: true,
   }
 );
 
+attachmentSchema.index({ organization: 1 });
+attachmentSchema.index({ department: 1 });
+attachmentSchema.index({ createdBy: 1 });
+attachmentSchema.index({ parentType: 1, parentId: 1 });
+attachmentSchema.index({ expiresAt: 1 });
+
 attachmentSchema.plugin(toJSONPlugin);
+attachSessionAwarePagination(attachmentSchema);
 attachmentSchema.plugin(softDeletePlugin);
 
 const Attachment =

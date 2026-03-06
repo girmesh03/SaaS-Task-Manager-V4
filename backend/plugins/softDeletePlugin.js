@@ -1,6 +1,8 @@
-import mongoose from "mongoose";
-
-import { MODEL_NAMES } from "../utils/constants.js";
+import {
+  buildReferenceField,
+  MODEL_NAMES,
+  SCHEMA_FIELD_LABELS,
+} from "../utils/index.js";
 
 const QUERY_MIDDLEWARE = [
   "find",
@@ -23,18 +25,21 @@ export const softDeletePlugin = (schema) => {
     isDeleted: {
       type: Boolean,
       default: false,
-      index: true,
     },
     deletedAt: {
       type: Date,
       default: null,
     },
-    deletedBy: {
-      type: mongoose.Schema.Types.ObjectId,
+    deletedBy: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.SOFT_DELETE.DELETED_BY,
       ref: MODEL_NAMES.USER,
-      default: null,
-    },
+      defaultValue: null,
+    }),
   });
+
+  schema.index({ isDeleted: 1 });
+  schema.index({ deletedAt: 1 });
+  schema.index({ deletedBy: 1 });
 
   schema.query.withDeleted = function withDeleted() {
     return this.setOptions({ withDeleted: true, onlyDeleted: false });

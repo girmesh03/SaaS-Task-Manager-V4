@@ -7,7 +7,7 @@ import {
 } from "../utils/constants.js";
 
 /**
- * Restricts a route to platform SuperAdmin actors only.
+ * Restricts a route to platform SuperAdmin users only.
  *
  * @param {import("express").Request} req - Express request.
  * @param {import("express").Response} res - Express response.
@@ -16,7 +16,7 @@ import {
  * @throws {never} This middleware forwards authorization errors.
  */
 export const requirePlatformSuperAdmin = (req, res, next) => {
-  if (req.actor?.role === ROLES.SUPER_ADMIN && req.actor?.isPlatformOrgUser) {
+  if (req.user?.role === ROLES.SUPER_ADMIN && req.user?.isPlatformOrgUser) {
     next();
     return;
   }

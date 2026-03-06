@@ -11,7 +11,7 @@ import {
 import { verifyAccessToken } from "../services/tokenService.js";
 
 /**
- * Validates the access-token cookie and attaches the authenticated actor context.
+ * Validates the access-token cookie and attaches the authenticated user context.
  *
  * @param {import("express").Request} req - Express request.
  * @param {import("express").Response} res - Express response.
@@ -29,17 +29,27 @@ export const requireAuth = (req, res, next) => {
 
     const claims = verifyAccessToken(token);
 
-    req.actor = {
-      userId: String(claims.userId),
-      organizationId: String(claims.organizationId),
-      departmentId: claims.departmentId ? String(claims.departmentId) : null,
+    if (!claims.user?._id || !claims.organization?._id) {
+      throwUnauthenticatedError();
+    }
+
+    req.user = {
+      _id: String(claims.user?._id),
+      organization: {
+        _id: String(claims.organization?._id),
+      },
+      department: claims.department?._id
+        ? {
+            _id: String(claims.department._id),
+          }
+        : null,
       role: String(claims.role),
       isHod: Boolean(claims.isHod),
       isPlatformOrgUser: Boolean(claims.isPlatformOrgUser),
     };
 
     if (req.requestContext) {
-      req.requestContext.actor = req.actor;
+      req.requestContext.user = req.user;
     }
 
     next();

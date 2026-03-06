@@ -16,11 +16,17 @@ import {
 import { createError } from "../utils/errorFactory.js";
 import { runInTransaction } from "../utils/mongo.js";
 
-const buildActorFromSession = (session) => ({
-  id: String(session.userId),
+const buildUserFromSession = (session) => ({
+  _id: String(session.user),
   role: session.role,
-  organizationId: String(session.organizationId),
-  departmentId: session.departmentId ? String(session.departmentId) : null,
+  organization: {
+    _id: String(session.organization),
+  },
+  department: session.department
+    ? {
+        _id: String(session.department),
+      }
+    : null,
   isHod: Boolean(session.isHod),
   isPlatformOrgUser: Boolean(session.isPlatformOrgUser),
 });
@@ -52,7 +58,7 @@ export const refreshSession = async ({
 
   return runInTransaction(async (session) => {
     const tokenHash = hashToken(refreshToken);
-    const currentSession = await RefreshTokenSession.findById(claims.sessionId)
+    const currentSession = await RefreshTokenSession.findById(claims.session?._id)
       .select("+tokenHash")
       .session(session)
       .exec();
@@ -80,8 +86,8 @@ export const refreshSession = async ({
 
     const newSessionId = new mongoose.Types.ObjectId();
     const newRefreshToken = createRefreshToken({
-      sessionId: String(newSessionId),
-      userId: String(currentSession.userId),
+      session: { _id: String(newSessionId) },
+      user: { _id: String(currentSession.user) },
     });
     const newTokenHash = hashToken(newRefreshToken);
 
@@ -89,9 +95,9 @@ export const refreshSession = async ({
       [
         {
           _id: newSessionId,
-          userId: currentSession.userId,
-          organizationId: currentSession.organizationId,
-          departmentId: currentSession.departmentId,
+          user: currentSession.user,
+          organization: currentSession.organization,
+          department: currentSession.department,
           role: currentSession.role,
           isHod: currentSession.isHod,
           isPlatformOrgUser: currentSession.isPlatformOrgUser,
@@ -106,19 +112,19 @@ export const refreshSession = async ({
     );
 
     currentSession.revokedAt = new Date();
-    currentSession.replacedBySessionId = newSessionId;
+    currentSession.replacedBySession = newSessionId;
     currentSession.lastUsedAt = new Date();
     currentSession.ip = actorIp;
     currentSession.userAgent = actorUserAgent;
     await currentSession.save({ session });
 
-    const user = buildActorFromSession(currentSession);
+    const user = buildUserFromSession(currentSession);
 
     return {
       accessToken: createAccessToken({
-        userId: user.id,
-        organizationId: user.organizationId,
-        departmentId: user.departmentId,
+        user: { _id: user._id },
+        organization: { _id: user.organization._id },
+        department: user.department ? { _id: user.department._id } : null,
         role: user.role,
         isHod: user.isHod,
         isPlatformOrgUser: user.isPlatformOrgUser,
@@ -144,7 +150,7 @@ export const logout = async ({ refreshToken }) => {
 
   try {
     const claims = verifyRefreshToken(refreshToken);
-    const session = await RefreshTokenSession.findById(claims.sessionId)
+    const session = await RefreshTokenSession.findById(claims.session?._id)
       .select("+tokenHash")
       .exec();
 

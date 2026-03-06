@@ -1,3 +1,6 @@
+/**
+ * @file Authentication route definitions.
+ */
 import express from "express";
 
 import {

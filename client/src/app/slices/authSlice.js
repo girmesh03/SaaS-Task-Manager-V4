@@ -1,7 +1,10 @@
+/**
+ * @file Authentication state slice.
+ */
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  actor: null,
+  user: null,
   status: "anonymous",
 };
 
@@ -9,16 +12,16 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setActor(state, action) {
-      state.actor = action.payload;
+    setUser(state, action) {
+      state.user = action.payload;
       state.status = action.payload ? "authenticated" : "anonymous";
     },
-    clearActor(state) {
-      state.actor = null;
+    clearUser(state) {
+      state.user = null;
       state.status = "anonymous";
     },
   },
 });
 
-export const { setActor, clearActor } = authSlice.actions;
+export const { setUser, clearUser } = authSlice.actions;
 export default authSlice.reducer;

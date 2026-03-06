@@ -1,3 +1,6 @@
+/**
+ * @file Application theme provider.
+ */
 import { useMemo } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
@@ -14,6 +17,13 @@ import {
 
 import { colorSchemes, typography, shadows, shape } from "./themePrimitives";
 
+/**
+ * App-wide MUI theme provider.
+ *
+ * @param {{ children: React.ReactNode }} props - Theme provider props.
+ * @returns {JSX.Element} Theme provider wrapper.
+ * @throws {never} This component does not throw.
+ */
 function AppTheme(props) {
   const { children } = props;
   const theme = useMemo(

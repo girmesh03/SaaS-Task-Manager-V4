@@ -1,3 +1,6 @@
+/**
+ * @file Theme overrides for feedback components.
+ */
 import { alpha } from "@mui/material/styles";
 import { gray, orange } from "../themePrimitives";
 

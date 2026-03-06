@@ -1,66 +1,68 @@
+/**
+ * @file User model schema.
+ */
 import mongoose from "mongoose";
 
 import { softDeletePlugin } from "../plugins/softDeletePlugin.js";
 import { toJSONPlugin } from "../plugins/toJSONPlugin.js";
 import {
+  attachSessionAwarePagination,
+  buildDateField,
+  buildEmailField,
+  buildPhoneField,
+  buildReferenceField,
+  buildStringField,
+  buildUrlField,
   MODEL_NAMES,
   ROLE_VALUES,
-} from "../utils/constants.js";
+  SCHEMA_FIELD_LABELS,
+  SCHEMA_FIELD_LIMITS,
+  SCHEMA_INDEX_FILTERS,
+} from "../utils/index.js";
 import { normalizeEmail, normalizePhoneNumber } from "../utils/sanitize.js";
 
 const userSchema = new mongoose.Schema(
   {
-    organizationId: {
-      type: mongoose.Schema.Types.ObjectId,
+    organization: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.USER.ORGANIZATION,
       ref: MODEL_NAMES.ORGANIZATION,
       required: true,
-      index: true,
-    },
-    departmentId: {
-      type: mongoose.Schema.Types.ObjectId,
+    }),
+    department: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.USER.DEPARTMENT,
       ref: MODEL_NAMES.DEPARTMENT,
       required: true,
-      index: true,
-    },
-    firstName: {
-      type: String,
+    }),
+    firstName: buildStringField({
+      label: SCHEMA_FIELD_LABELS.USER.FIRST_NAME,
       required: true,
-      trim: true,
-      maxlength: 60,
-    },
-    lastName: {
-      type: String,
+      maxLength: SCHEMA_FIELD_LIMITS.USER_FIRST_NAME_MAX_LENGTH,
+    }),
+    lastName: buildStringField({
+      label: SCHEMA_FIELD_LABELS.USER.LAST_NAME,
       required: true,
-      trim: true,
-      maxlength: 60,
-    },
-    fullName: {
-      type: String,
-      trim: true,
-      maxlength: 121,
-    },
-    position: {
-      type: String,
-      trim: true,
-      maxlength: 120,
-    },
-    email: {
-      type: String,
+      maxLength: SCHEMA_FIELD_LIMITS.USER_LAST_NAME_MAX_LENGTH,
+    }),
+    fullName: buildStringField({
+      label: SCHEMA_FIELD_LABELS.USER.FULL_NAME,
+      maxLength: SCHEMA_FIELD_LIMITS.USER_FULL_NAME_MAX_LENGTH,
+    }),
+    position: buildStringField({
+      label: SCHEMA_FIELD_LABELS.USER.POSITION,
+      maxLength: SCHEMA_FIELD_LIMITS.USER_POSITION_MAX_LENGTH,
+    }),
+    email: buildEmailField({
+      label: SCHEMA_FIELD_LABELS.USER.EMAIL,
       required: true,
-      trim: true,
-      lowercase: true,
-      unique: true,
-      index: true,
-    },
-    phone: {
-      type: String,
-      trim: true,
-    },
-    role: {
-      type: String,
+    }),
+    phone: buildPhoneField({
+      label: SCHEMA_FIELD_LABELS.USER.PHONE,
+    }),
+    role: buildStringField({
+      label: SCHEMA_FIELD_LABELS.USER.ROLE,
       required: true,
-      enum: ROLE_VALUES,
-    },
+      enumValues: ROLE_VALUES,
+    }),
     isHod: {
       type: Boolean,
       default: false,
@@ -78,10 +80,9 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    avatarUrl: {
-      type: String,
-      trim: true,
-    },
+    avatarUrl: buildUrlField({
+      label: SCHEMA_FIELD_LABELS.USER.AVATAR_URL,
+    }),
     passwordHash: {
       type: String,
       select: false,
@@ -91,16 +92,26 @@ const userSchema = new mongoose.Schema(
       select: false,
       default: [],
     },
-    joinedAt: {
-      type: Date,
-      default: Date.now,
+    joinedAt: buildDateField({
+      label: SCHEMA_FIELD_LABELS.USER.JOINED_AT,
+      defaultValue: Date.now,
       immutable: true,
-    },
+    }),
   },
   {
     timestamps: true,
   }
 );
+
+userSchema.index(
+  { email: 1 },
+  {
+    unique: true,
+    partialFilterExpression: SCHEMA_INDEX_FILTERS.NOT_DELETED_WITH_EMAIL,
+  }
+);
+userSchema.index({ organization: 1 });
+userSchema.index({ department: 1 });
 
 userSchema.pre("validate", function normalizeUserFields(next) {
   if (this.email) {
@@ -116,6 +127,7 @@ userSchema.pre("validate", function normalizeUserFields(next) {
 });
 
 userSchema.plugin(toJSONPlugin);
+attachSessionAwarePagination(userSchema);
 userSchema.plugin(softDeletePlugin);
 
 const User =

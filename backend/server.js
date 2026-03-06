@@ -1,3 +1,6 @@
+/**
+ * @file HTTP server bootstrap, database lifecycle, and graceful shutdown wiring.
+ */
 import http from "http";
 
 import { attachSocketServer } from "./config/socket.js";

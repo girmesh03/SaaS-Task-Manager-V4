@@ -1,3 +1,6 @@
+/**
+ * @file Persisted user preferences state slice.
+ */
 import { createSlice } from "@reduxjs/toolkit";
 
 const getDefaultTimezone = () =>

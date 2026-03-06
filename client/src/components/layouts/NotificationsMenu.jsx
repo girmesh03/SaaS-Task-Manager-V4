@@ -76,7 +76,7 @@ const NotificationsMenu = ({
             <ListItemButton key={notification.id} sx={{ alignItems: "flex-start" }}>
               <ListItemText
                 primary={notification.title}
-                secondary={`${notification.message} • ${notification.createdAt}`}
+                secondary={[notification.message, notification.createdAt].join(" | ")}
                 primaryTypographyProps={{
                   fontWeight: notification.unread ? 700 : 500,
                 }}

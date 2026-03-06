@@ -1,3 +1,6 @@
+/**
+ * @file Root API router and module mount points.
+ */
 import express from "express";
 
 import { sendSuccess } from "../utils/apiResponse.js";

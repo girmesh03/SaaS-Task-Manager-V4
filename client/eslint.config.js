@@ -1,3 +1,6 @@
+/**
+ * @file ESLint configuration for the client workspace.
+ */
 import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'

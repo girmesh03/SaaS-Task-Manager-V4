@@ -1,3 +1,6 @@
+/**
+ * @file Theme overrides for data display components.
+ */
 import { alpha } from "@mui/material/styles";
 import { svgIconClasses } from "@mui/material/SvgIcon";
 import { typographyClasses } from "@mui/material/Typography";

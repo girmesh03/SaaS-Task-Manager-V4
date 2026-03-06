@@ -1,3 +1,6 @@
+/**
+ * @file Theme overrides for the MUI Data Grid.
+ */
 import { paperClasses } from "@mui/material/Paper";
 import { alpha } from "@mui/material/styles";
 

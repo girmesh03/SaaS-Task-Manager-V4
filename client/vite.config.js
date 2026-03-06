@@ -1,3 +1,6 @@
+/**
+ * @file Vite configuration for the client workspace.
+ */
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 

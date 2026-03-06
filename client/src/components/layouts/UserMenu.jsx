@@ -20,7 +20,7 @@ import { useAuth } from "../../hooks/useAuth";
 /**
  * User menu component with account actions and optional platform tools.
  *
- * @param {{ user: { id: string | null; fullName: string; email: string; avatarUrl: string } | null; isPlatformSuperAdmin?: boolean }} props - Component props.
+ * @param {{ user: { _id: string | null; fullName: string; email: string; avatarUrl: string } | null; isPlatformSuperAdmin?: boolean }} props - Component props.
  * @returns {JSX.Element} User menu element.
  * @throws {never} This component does not throw.
  */
@@ -101,7 +101,7 @@ const UserMenu = ({ user, isPlatformSuperAdmin = false }) => {
         <MenuItem
           onClick={() => {
             handleClose();
-            logout();
+            void logout();
           }}
         >
           <ListItemIcon>

@@ -33,6 +33,7 @@ import {
 import {
   BOTTOM_NAV_ITEMS,
   LAYOUT_DIMENSIONS,
+  ROLES,
   TASK_TYPE_LABELS,
   UI_PLACEHOLDERS,
 } from "../../utils/constants";
@@ -62,7 +63,7 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const navigation = useNavigation();
-  const { actor } = useAuth();
+  const { user: currentUser } = useAuth();
   const socketStatus = useSocketStatus();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -70,14 +71,14 @@ const DashboardLayout = () => {
   const isNavigating = navigation.state !== "idle";
   const isXs = useMediaQuery(theme.breakpoints.only("xs"));
 
-  const user = useMemo(
+  const appBarUser = useMemo(
     () => ({
-      id: actor?.id || actor?.userId || null,
-      fullName: actor?.fullName || "Workspace User",
-      email: actor?.email || "workspace@example.com",
-      avatarUrl: actor?.avatarUrl || "",
+      _id: currentUser?._id || null,
+      fullName: currentUser?.fullName || "Workspace User",
+      email: currentUser?.email || "workspace@example.com",
+      avatarUrl: currentUser?.avatarUrl || "",
     }),
-    [actor]
+    [currentUser]
   );
 
   const currentTitle =
@@ -104,9 +105,9 @@ const DashboardLayout = () => {
         unreadCount={UI_PLACEHOLDERS.NOTIFICATION_BADGE_COUNT}
         notificationsDisabled={false}
         onViewAllNotifications={() => navigate("/dashboard/settings")}
-        user={user}
+        user={appBarUser}
         isPlatformSuperAdmin={Boolean(
-          actor?.role === "SuperAdmin" && actor?.isPlatformOrgUser
+          currentUser?.role === ROLES.SUPER_ADMIN && currentUser?.isPlatformOrgUser
         )}
         isConnected={socketStatus.isConnected}
       />
@@ -115,7 +116,7 @@ const DashboardLayout = () => {
         mobileOpen={mobileDrawerOpen}
         onMobileClose={() => setMobileDrawerOpen(false)}
         onNavigate={() => setMobileDrawerOpen(false)}
-        isSuperAdmin={Boolean(actor?.role === "SuperAdmin")}
+        isSuperAdmin={Boolean(currentUser?.role === ROLES.SUPER_ADMIN)}
       />
 
       <Box

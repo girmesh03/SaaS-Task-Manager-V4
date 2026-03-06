@@ -1,33 +1,41 @@
+/**
+ * @file Department model schema.
+ */
 import mongoose from "mongoose";
 
 import { softDeletePlugin } from "../plugins/softDeletePlugin.js";
 import { toJSONPlugin } from "../plugins/toJSONPlugin.js";
-import { MODEL_NAMES } from "../utils/constants.js";
+import {
+  attachSessionAwarePagination,
+  buildReferenceField,
+  buildStringField,
+  MODEL_NAMES,
+  SCHEMA_FIELD_LABELS,
+  SCHEMA_FIELD_LIMITS,
+  SCHEMA_INDEX_FILTERS,
+} from "../utils/index.js";
 
 const departmentSchema = new mongoose.Schema(
   {
-    organizationId: {
-      type: mongoose.Schema.Types.ObjectId,
+    organization: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.DEPARTMENT.ORGANIZATION,
       ref: MODEL_NAMES.ORGANIZATION,
       required: true,
-      index: true,
-    },
-    name: {
-      type: String,
+    }),
+    name: buildStringField({
+      label: SCHEMA_FIELD_LABELS.DEPARTMENT.NAME,
       required: true,
-      trim: true,
-      maxlength: 120,
-    },
-    description: {
-      type: String,
-      trim: true,
-      maxlength: 500,
-    },
-    managerId: {
-      type: mongoose.Schema.Types.ObjectId,
+      maxLength: SCHEMA_FIELD_LIMITS.DEPARTMENT_NAME_MAX_LENGTH,
+    }),
+    description: buildStringField({
+      label: SCHEMA_FIELD_LABELS.DEPARTMENT.DESCRIPTION,
+      maxLength: SCHEMA_FIELD_LIMITS.DEPARTMENT_DESCRIPTION_MAX_LENGTH,
+    }),
+    manager: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.DEPARTMENT.MANAGER,
       ref: MODEL_NAMES.USER,
-      default: null,
-    },
+      defaultValue: null,
+    }),
     isActive: {
       type: Boolean,
       default: true,
@@ -39,18 +47,17 @@ const departmentSchema = new mongoose.Schema(
 );
 
 departmentSchema.index(
-  { organizationId: 1, name: 1 },
+  { organization: 1, name: 1 },
   {
     unique: true,
-    partialFilterExpression: {
-      isDeleted: {
-        $ne: true,
-      },
-    },
+    partialFilterExpression: SCHEMA_INDEX_FILTERS.NOT_DELETED,
   }
 );
+departmentSchema.index({ organization: 1 });
+departmentSchema.index({ manager: 1 });
 
 departmentSchema.plugin(toJSONPlugin);
+attachSessionAwarePagination(departmentSchema);
 departmentSchema.plugin(softDeletePlugin);
 
 const Department =

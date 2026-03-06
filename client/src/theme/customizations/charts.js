@@ -1,3 +1,6 @@
+/**
+ * @file Theme overrides for charts.
+ */
 import { axisClasses, legendClasses, chartsGridClasses } from "@mui/x-charts";
 import { gray } from "../themePrimitives";
 

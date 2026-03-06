@@ -1,3 +1,6 @@
+/**
+ * @file Theme overrides for navigation components.
+ */
 import { createElement, forwardRef } from "react";
 import { alpha } from "@mui/material/styles";
 import { buttonBaseClasses } from "@mui/material/ButtonBase";

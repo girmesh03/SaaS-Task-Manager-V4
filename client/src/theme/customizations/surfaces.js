@@ -1,3 +1,6 @@
+/**
+ * @file Theme overrides for surface components.
+ */
 import { alpha } from "@mui/material/styles";
 import { gray } from "../themePrimitives";
 

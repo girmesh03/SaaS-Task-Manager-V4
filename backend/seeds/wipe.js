@@ -1,3 +1,5 @@
+import path from "path";
+import { fileURLToPath } from "url";
 import { connectDb, disconnectDb } from "../config/db.js";
 import Attachment from "../models/Attachment.js";
 import Department from "../models/Department.js";
@@ -19,13 +21,13 @@ export const wipeNonPlatformData = async () => {
 
   try {
     return await runInTransaction(async (session) => {
-      const organizationIds = await Organization.find({
+      const organizationRecords = await Organization.find({
         isPlatformOrg: false,
       })
         .withDeleted()
         .select("_id")
         .session(session);
-      const ids = organizationIds.map((item) => item._id);
+      const ids = organizationRecords.map((item) => item._id);
 
       if (ids.length === 0) {
         return {
@@ -34,13 +36,13 @@ export const wipeNonPlatformData = async () => {
         };
       }
 
-      await Notification.deleteMany({ organizationId: { $in: ids } }).session(session);
-      await Attachment.deleteMany({ organizationId: { $in: ids } }).session(session);
-      await RefreshTokenSession.deleteMany({ organizationId: { $in: ids } }).session(
+      await Notification.deleteMany({ organization: { $in: ids } }).session(session);
+      await Attachment.deleteMany({ organization: { $in: ids } }).session(session);
+      await RefreshTokenSession.deleteMany({ organization: { $in: ids } }).session(
         session
       );
-      await User.deleteMany({ organizationId: { $in: ids } }).session(session);
-      await Department.deleteMany({ organizationId: { $in: ids } }).session(session);
+      await User.deleteMany({ organization: { $in: ids } }).session(session);
+      await Department.deleteMany({ organization: { $in: ids } }).session(session);
       await Organization.deleteMany({ _id: { $in: ids } }).session(session);
 
       return {
@@ -52,3 +54,19 @@ export const wipeNonPlatformData = async () => {
     await disconnectDb();
   }
 };
+
+const currentFilePath = fileURLToPath(import.meta.url);
+const isDirectExecution =
+  Boolean(process.argv[1]) && path.resolve(process.argv[1]) === currentFilePath;
+
+if (isDirectExecution) {
+  wipeNonPlatformData()
+    .then((result) => {
+      console.info(JSON.stringify(result, null, 2));
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error(error instanceof Error ? error.message : API_MESSAGES.INTERNAL_SERVER_ERROR);
+      process.exit(1);
+    });
+}

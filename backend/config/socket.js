@@ -15,22 +15,30 @@ const presenceCounters = new Map();
 
 const createRoomName = (prefix, id) => `${prefix}:${id}`;
 
-const emitPresenceUpdate = (socket, actor, isOnline) => {
+const emitPresenceUpdate = (socket, user, isOnline) => {
   const payload = {
-    userId: actor.userId,
-    organizationId: actor.organizationId,
-    departmentId: actor.departmentId,
+    user: {
+      _id: user._id,
+    },
+    organization: {
+      _id: user.organization._id,
+    },
+    department: user.department
+      ? {
+          _id: user.department._id,
+        }
+      : null,
     isOnline,
     updatedAt: new Date().toISOString(),
   };
 
   socket
-    .to(createRoomName(SOCKET_ROOM_PREFIXES.ORGANIZATION, actor.organizationId))
+    .to(createRoomName(SOCKET_ROOM_PREFIXES.ORGANIZATION, user.organization._id))
     .emit(SOCKET_EVENT_NAMES.PRESENCE_UPDATED, payload);
 
-  if (actor.departmentId) {
+  if (user.department?._id) {
     socket
-      .to(createRoomName(SOCKET_ROOM_PREFIXES.DEPARTMENT, actor.departmentId))
+      .to(createRoomName(SOCKET_ROOM_PREFIXES.DEPARTMENT, user.department._id))
       .emit(SOCKET_EVENT_NAMES.PRESENCE_UPDATED, payload);
   }
 };
@@ -68,10 +76,21 @@ export const attachSocketServer = (httpServer) => {
 
       const claims = verifyAccessToken(token);
 
-      socket.data.actor = {
-        userId: String(claims.userId),
-        organizationId: String(claims.organizationId),
-        departmentId: claims.departmentId ? String(claims.departmentId) : null,
+      if (!claims.user?._id || !claims.organization?._id) {
+        next(new Error("Authentication required."));
+        return;
+      }
+
+      socket.data.user = {
+        _id: String(claims.user?._id),
+        organization: {
+          _id: String(claims.organization?._id),
+        },
+        department: claims.department?._id
+          ? {
+              _id: String(claims.department._id),
+            }
+          : null,
         role: String(claims.role),
         isHod: Boolean(claims.isHod),
         isPlatformOrgUser: Boolean(claims.isPlatformOrgUser),
@@ -87,49 +106,49 @@ export const attachSocketServer = (httpServer) => {
   });
 
   ioInstance.on("connection", (socket) => {
-    const actor = socket.data.actor;
-    const userRoom = createRoomName(SOCKET_ROOM_PREFIXES.USER, actor.userId);
+    const user = socket.data.user;
+    const userRoom = createRoomName(SOCKET_ROOM_PREFIXES.USER, user._id);
     const orgRoom = createRoomName(
       SOCKET_ROOM_PREFIXES.ORGANIZATION,
-      actor.organizationId
+      user.organization._id
     );
 
     socket.join(userRoom);
     socket.join(orgRoom);
 
-    if (actor.departmentId) {
+    if (user.department?._id) {
       socket.join(
-        createRoomName(SOCKET_ROOM_PREFIXES.DEPARTMENT, actor.departmentId)
+        createRoomName(SOCKET_ROOM_PREFIXES.DEPARTMENT, user.department._id)
       );
     }
 
-    const nextCount = (presenceCounters.get(actor.userId) || 0) + 1;
-    presenceCounters.set(actor.userId, nextCount);
+    const nextCount = (presenceCounters.get(user._id) || 0) + 1;
+    presenceCounters.set(user._id, nextCount);
 
     if (nextCount === 1) {
-      emitPresenceUpdate(socket, actor, true);
+      emitPresenceUpdate(socket, user, true);
     }
 
     logger.info("Socket client connected", {
-      userId: actor.userId,
+      user: { _id: user._id },
       requestId: socket.id,
     });
 
     socket.on("disconnect", () => {
       const currentCount = Math.max(
-        (presenceCounters.get(actor.userId) || 1) - 1,
+        (presenceCounters.get(user._id) || 1) - 1,
         0
       );
 
       if (currentCount === 0) {
-        presenceCounters.delete(actor.userId);
-        emitPresenceUpdate(socket, actor, false);
+        presenceCounters.delete(user._id);
+        emitPresenceUpdate(socket, user, false);
       } else {
-        presenceCounters.set(actor.userId, currentCount);
+        presenceCounters.set(user._id, currentCount);
       }
 
       logger.info("Socket client disconnected", {
-        userId: actor.userId,
+        user: { _id: user._id },
         requestId: socket.id,
       });
     });

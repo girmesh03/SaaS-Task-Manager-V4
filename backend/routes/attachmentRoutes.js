@@ -1,3 +1,6 @@
+/**
+ * @file Attachment route definitions.
+ */
 import express from "express";
 
 const router = express.Router();

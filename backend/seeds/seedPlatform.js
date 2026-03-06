@@ -1,3 +1,5 @@
+import path from "path";
+import { fileURLToPath } from "url";
 import bcrypt from "bcrypt";
 
 import { connectDb, disconnectDb } from "../config/db.js";
@@ -17,7 +19,7 @@ import {
 /**
  * Idempotently seeds the platform organization, its initial department, and SuperAdmin.
  *
- * @returns {Promise<{ message: string, organizationId: string, departmentId: string, userId: string }>} Seed summary.
+ * @returns {Promise<{ message: string, organization: { _id: string }, department: { _id: string }, user: { _id: string } }>} Seed summary.
  * @throws {Error} Propagates database and hashing failures.
  */
 export const seedPlatform = async () => {
@@ -54,7 +56,7 @@ export const seedPlatform = async () => {
       }
 
       let department = await Department.findOne({
-        organizationId: organization._id,
+        organization: organization._id,
         name: PLATFORM_SEED.departmentName || "Platform Administration",
       })
         .withDeleted()
@@ -64,7 +66,7 @@ export const seedPlatform = async () => {
         department = await Department.create(
           [
             {
-              organizationId: organization._id,
+              organization: organization._id,
               name: PLATFORM_SEED.departmentName || "Platform Administration",
               description: PLATFORM_SEED.departmentDescription || "",
               isActive: true,
@@ -88,8 +90,8 @@ export const seedPlatform = async () => {
         user = await User.create(
           [
             {
-              organizationId: organization._id,
-              departmentId: department._id,
+              organization: organization._id,
+              department: department._id,
               firstName: PLATFORM_SEED.adminFirstName || "Platform",
               lastName: PLATFORM_SEED.adminLastName || "Admin",
               position: PLATFORM_SEED.adminPosition || "System Owner",
@@ -108,12 +110,28 @@ export const seedPlatform = async () => {
 
       return {
         message: API_MESSAGES.PLATFORM_SEED_COMPLETED,
-        organizationId: String(organization._id),
-        departmentId: String(department._id),
-        userId: String(user._id),
+        organization: { _id: String(organization._id) },
+        department: { _id: String(department._id) },
+        user: { _id: String(user._id) },
       };
     });
   } finally {
     await disconnectDb();
   }
 };
+
+const currentFilePath = fileURLToPath(import.meta.url);
+const isDirectExecution =
+  Boolean(process.argv[1]) && path.resolve(process.argv[1]) === currentFilePath;
+
+if (isDirectExecution) {
+  seedPlatform()
+    .then((result) => {
+      console.info(JSON.stringify(result, null, 2));
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error(error instanceof Error ? error.message : API_MESSAGES.INTERNAL_SERVER_ERROR);
+      process.exit(1);
+    });
+}

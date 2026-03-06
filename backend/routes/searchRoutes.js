@@ -1,3 +1,6 @@
+/**
+ * @file Search route definitions.
+ */
 import express from "express";
 
 const router = express.Router();

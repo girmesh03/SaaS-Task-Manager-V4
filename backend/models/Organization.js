@@ -1,60 +1,61 @@
+/**
+ * @file Organization model schema.
+ */
 import mongoose from "mongoose";
 
 import { softDeletePlugin } from "../plugins/softDeletePlugin.js";
 import { toJSONPlugin } from "../plugins/toJSONPlugin.js";
 import {
+  attachSessionAwarePagination,
+  buildEmailField,
+  buildPhoneField,
+  buildStringField,
+  buildUrlField,
   MODEL_NAMES,
   ORGANIZATION_SIZE_VALUES,
-} from "../utils/constants.js";
+  SCHEMA_FIELD_LABELS,
+  SCHEMA_FIELD_LIMITS,
+  SCHEMA_INDEX_FILTERS,
+} from "../utils/index.js";
 import { normalizeEmail, normalizePhoneNumber } from "../utils/sanitize.js";
 
 const organizationSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
+    name: buildStringField({
+      label: SCHEMA_FIELD_LABELS.ORGANIZATION.NAME,
       required: true,
-      trim: true,
-      maxlength: 120,
-    },
-    description: {
-      type: String,
-      trim: true,
-      maxlength: 500,
-    },
-    email: {
-      type: String,
-      trim: true,
-      lowercase: true,
-      index: true,
-    },
-    phone: {
-      type: String,
-      trim: true,
-    },
-    address: {
-      type: String,
-      trim: true,
-      maxlength: 240,
-    },
-    website: {
-      type: String,
-      trim: true,
-    },
-    industry: {
-      type: String,
-      trim: true,
-      maxlength: 120,
-    },
-    size: {
-      type: String,
-      enum: ORGANIZATION_SIZE_VALUES,
-      default: ORGANIZATION_SIZE_VALUES[0],
-    },
+      maxLength: SCHEMA_FIELD_LIMITS.ORGANIZATION_NAME_MAX_LENGTH,
+    }),
+    description: buildStringField({
+      label: SCHEMA_FIELD_LABELS.ORGANIZATION.DESCRIPTION,
+      maxLength: SCHEMA_FIELD_LIMITS.ORGANIZATION_DESCRIPTION_MAX_LENGTH,
+    }),
+    email: buildEmailField({
+      label: SCHEMA_FIELD_LABELS.ORGANIZATION.EMAIL,
+    }),
+    phone: buildPhoneField({
+      label: SCHEMA_FIELD_LABELS.ORGANIZATION.PHONE,
+    }),
+    address: buildStringField({
+      label: SCHEMA_FIELD_LABELS.ORGANIZATION.ADDRESS,
+      maxLength: SCHEMA_FIELD_LIMITS.ORGANIZATION_ADDRESS_MAX_LENGTH,
+    }),
+    website: buildUrlField({
+      label: SCHEMA_FIELD_LABELS.ORGANIZATION.WEBSITE,
+    }),
+    industry: buildStringField({
+      label: SCHEMA_FIELD_LABELS.ORGANIZATION.INDUSTRY,
+      maxLength: SCHEMA_FIELD_LIMITS.ORGANIZATION_INDUSTRY_MAX_LENGTH,
+    }),
+    size: buildStringField({
+      label: SCHEMA_FIELD_LABELS.ORGANIZATION.SIZE,
+      enumValues: ORGANIZATION_SIZE_VALUES,
+      defaultValue: ORGANIZATION_SIZE_VALUES[0],
+    }),
     isPlatformOrg: {
       type: Boolean,
       default: false,
       immutable: true,
-      index: true,
     },
     isActive: {
       type: Boolean,
@@ -65,6 +66,14 @@ const organizationSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+organizationSchema.index(
+  { email: 1 },
+  {
+    partialFilterExpression: SCHEMA_INDEX_FILTERS.NOT_DELETED_WITH_EMAIL,
+  }
+);
+organizationSchema.index({ isPlatformOrg: 1 });
 
 organizationSchema.pre("validate", function normalizeOrganizationFields(next) {
   if (this.email) {
@@ -79,6 +88,7 @@ organizationSchema.pre("validate", function normalizeOrganizationFields(next) {
 });
 
 organizationSchema.plugin(toJSONPlugin);
+attachSessionAwarePagination(organizationSchema);
 organizationSchema.plugin(softDeletePlugin);
 
 const Organization =

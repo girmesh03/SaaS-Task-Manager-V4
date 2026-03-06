@@ -1,3 +1,6 @@
+/**
+ * @file Theme customization index exports.
+ */
 export { default as inputsCustomizations } from "./inputs";
 export { default as dataDisplayCustomizations } from "./dataDisplay";
 export { default as feedbackCustomizations } from "./feedback";

@@ -1,3 +1,6 @@
+/**
+ * @file Root reducer assembly.
+ */
 import { combineReducers } from "@reduxjs/toolkit";
 
 import { apiSlice } from "../api/apiSlice";

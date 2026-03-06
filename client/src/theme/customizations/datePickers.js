@@ -1,3 +1,6 @@
+/**
+ * @file Theme overrides for date pickers.
+ */
 import { alpha } from '@mui/material/styles';
 import { menuItemClasses } from '@mui/material/MenuItem';
 import { pickersDayClasses, yearCalendarClasses } from '@mui/x-date-pickers';

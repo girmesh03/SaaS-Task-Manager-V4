@@ -1,78 +1,88 @@
+/**
+ * @file Notification model schema.
+ */
 import mongoose from "mongoose";
 
 import { softDeletePlugin } from "../plugins/softDeletePlugin.js";
 import { toJSONPlugin } from "../plugins/toJSONPlugin.js";
-import { MODEL_NAMES } from "../utils/constants.js";
+import {
+  attachSessionAwarePagination,
+  buildDateField,
+  buildReferenceField,
+  buildStringField,
+  MODEL_NAMES,
+  SCHEMA_FIELD_LABELS,
+  SCHEMA_FIELD_LIMITS,
+} from "../utils/index.js";
 
 const notificationSchema = new mongoose.Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
+    user: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.NOTIFICATION.USER,
       ref: MODEL_NAMES.USER,
       required: true,
-      index: true,
-    },
-    organizationId: {
-      type: mongoose.Schema.Types.ObjectId,
+    }),
+    organization: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.NOTIFICATION.ORGANIZATION,
       ref: MODEL_NAMES.ORGANIZATION,
       required: true,
-      index: true,
-    },
-    departmentId: {
-      type: mongoose.Schema.Types.ObjectId,
+    }),
+    department: buildReferenceField({
+      label: SCHEMA_FIELD_LABELS.NOTIFICATION.DEPARTMENT,
       ref: MODEL_NAMES.DEPARTMENT,
-      default: null,
-      index: true,
-    },
-    type: {
-      type: String,
+      defaultValue: null,
+    }),
+    type: buildStringField({
+      label: SCHEMA_FIELD_LABELS.NOTIFICATION.TYPE,
       required: true,
-      trim: true,
-      maxlength: 80,
-    },
-    title: {
-      type: String,
+      maxLength: SCHEMA_FIELD_LIMITS.NOTIFICATION_TYPE_MAX_LENGTH,
+    }),
+    title: buildStringField({
+      label: SCHEMA_FIELD_LABELS.NOTIFICATION.TITLE,
       required: true,
-      trim: true,
-      maxlength: 160,
-    },
-    message: {
-      type: String,
+      maxLength: SCHEMA_FIELD_LIMITS.NOTIFICATION_TITLE_MAX_LENGTH,
+    }),
+    message: buildStringField({
+      label: SCHEMA_FIELD_LABELS.NOTIFICATION.MESSAGE,
       required: true,
-      trim: true,
-      maxlength: 500,
-    },
-    route: {
-      type: String,
-      trim: true,
-      default: null,
-    },
-    entityType: {
-      type: String,
-      trim: true,
-      default: null,
-    },
-    entityId: {
-      type: String,
-      trim: true,
-      default: null,
-    },
+      maxLength: SCHEMA_FIELD_LIMITS.NOTIFICATION_MESSAGE_MAX_LENGTH,
+    }),
+    route: buildStringField({
+      label: SCHEMA_FIELD_LABELS.NOTIFICATION.ROUTE,
+      maxLength: SCHEMA_FIELD_LIMITS.URL_MAX_LENGTH,
+      defaultValue: null,
+    }),
+    entityType: buildStringField({
+      label: SCHEMA_FIELD_LABELS.NOTIFICATION.ENTITY_TYPE,
+      maxLength: SCHEMA_FIELD_LIMITS.ENTITY_TYPE_MAX_LENGTH,
+      defaultValue: null,
+    }),
+    entityId: buildStringField({
+      label: SCHEMA_FIELD_LABELS.NOTIFICATION.ENTITY_ID,
+      maxLength: SCHEMA_FIELD_LIMITS.ENTITY_ID_MAX_LENGTH,
+      defaultValue: null,
+    }),
     isRead: {
       type: Boolean,
       default: false,
     },
-    expiresAt: {
-      type: Date,
+    expiresAt: buildDateField({
+      label: SCHEMA_FIELD_LABELS.NOTIFICATION.EXPIRES_AT,
       required: true,
-      index: true,
-    },
+    }),
   },
   {
     timestamps: true,
   }
 );
 
+notificationSchema.index({ user: 1, isRead: 1 });
+notificationSchema.index({ organization: 1 });
+notificationSchema.index({ department: 1 });
+notificationSchema.index({ expiresAt: 1 });
+
 notificationSchema.plugin(toJSONPlugin);
+attachSessionAwarePagination(notificationSchema);
 notificationSchema.plugin(softDeletePlugin);
 
 const Notification =

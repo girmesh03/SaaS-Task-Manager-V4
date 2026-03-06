@@ -19,12 +19,14 @@ import { connectSocket, disconnectSocket } from "../../api/socketClient";
  */
 const RootLayout = () => {
   const theme = useTheme();
-  const actor = useSelector((state) => state.auth.actor);
+  const user = useSelector((state) => state.auth.user);
 
-  useGetCsrfTokenQuery();
+  useGetCsrfTokenQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
 
   useEffect(() => {
-    if (actor?.id || actor?.userId) {
+    if (user?._id) {
       connectSocket();
 
       return () => {
@@ -34,7 +36,7 @@ const RootLayout = () => {
 
     disconnectSocket();
     return undefined;
-  }, [actor]);
+  }, [user]);
 
   return (
     <Container sx={{ minHeight: "100vh" }}>

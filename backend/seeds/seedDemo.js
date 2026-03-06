@@ -1,3 +1,5 @@
+import path from "path";
+import { fileURLToPath } from "url";
 import bcrypt from "bcrypt";
 
 import { connectDb, disconnectDb } from "../config/db.js";
@@ -16,7 +18,7 @@ import {
 /**
  * Idempotently seeds a demo tenant in non-production environments.
  *
- * @returns {Promise<{ message: string, organizationId: string, departmentId: string, userId: string }>} Seed summary.
+ * @returns {Promise<{ message: string, organization: { _id: string }, department: { _id: string }, user: { _id: string } }>} Seed summary.
  * @throws {Error} Propagates environment and persistence failures.
  */
 export const seedDemo = async () => {
@@ -55,7 +57,7 @@ export const seedDemo = async () => {
       }
 
       let department = await Department.findOne({
-        organizationId: organization._id,
+        organization: organization._id,
         name: DEMO_SEED_DEFAULTS.DEPARTMENT_NAME,
       })
         .withDeleted()
@@ -65,7 +67,7 @@ export const seedDemo = async () => {
         department = await Department.create(
           [
             {
-              organizationId: organization._id,
+              organization: organization._id,
               name: DEMO_SEED_DEFAULTS.DEPARTMENT_NAME,
               description: DEMO_SEED_DEFAULTS.DEPARTMENT_DESCRIPTION,
               isActive: true,
@@ -85,8 +87,8 @@ export const seedDemo = async () => {
         user = await User.create(
           [
             {
-              organizationId: organization._id,
-              departmentId: department._id,
+              organization: organization._id,
+              department: department._id,
               firstName: DEMO_SEED_DEFAULTS.ADMIN_FIRST_NAME,
               lastName: DEMO_SEED_DEFAULTS.ADMIN_LAST_NAME,
               position: DEMO_SEED_DEFAULTS.ADMIN_POSITION,
@@ -108,12 +110,28 @@ export const seedDemo = async () => {
 
       return {
         message: API_MESSAGES.DEMO_SEED_COMPLETED,
-        organizationId: String(organization._id),
-        departmentId: String(department._id),
-        userId: String(user._id),
+        organization: { _id: String(organization._id) },
+        department: { _id: String(department._id) },
+        user: { _id: String(user._id) },
       };
     });
   } finally {
     await disconnectDb();
   }
 };
+
+const currentFilePath = fileURLToPath(import.meta.url);
+const isDirectExecution =
+  Boolean(process.argv[1]) && path.resolve(process.argv[1]) === currentFilePath;
+
+if (isDirectExecution) {
+  seedDemo()
+    .then((result) => {
+      console.info(JSON.stringify(result, null, 2));
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error(error instanceof Error ? error.message : API_MESSAGES.INTERNAL_SERVER_ERROR);
+      process.exit(1);
+    });
+}

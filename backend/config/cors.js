@@ -20,7 +20,7 @@ export const corsMiddleware = () => {
     credentials: true,
     methods: SECURITY_CONSTANTS.CORS_ALLOWED_METHODS,
     allowedHeaders: SECURITY_CONSTANTS.CORS_ALLOWED_HEADERS,
-    maxAge: IS_PRODUCTION ? 86_400 : undefined,
+    maxAge: IS_PRODUCTION ? SECURITY_CONSTANTS.CORS_MAX_AGE_SECONDS : undefined,
     origin(origin, callback) {
       if (!origin || CORS_ALLOWED_ORIGINS.includes(origin)) {
         callback(null, true);

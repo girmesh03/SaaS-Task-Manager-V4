@@ -1,3 +1,6 @@
+/**
+ * @file Theme overrides for input components.
+ */
 import { createElement } from "react";
 import { alpha } from "@mui/material/styles";
 import { outlinedInputClasses } from "@mui/material/OutlinedInput";
@@ -19,6 +22,10 @@ const inputsCustomizations = {
       root: ({ theme }) => ({
         boxSizing: "border-box",
         transition: "all 100ms ease-in",
+        [theme.breakpoints.down("md")]: {
+          minWidth: 44,
+          minHeight: 44,
+        },
         "&:focus-visible": {
           outline: `3px solid ${alpha(theme.palette.primary.main, 0.5)}`,
           outlineOffset: "2px",
@@ -40,6 +47,9 @@ const inputsCustomizations = {
             style: {
               height: "2.25rem",
               padding: "8px 12px",
+              [theme.breakpoints.down("md")]: {
+                minHeight: 44,
+              },
             },
           },
           {
@@ -48,6 +58,9 @@ const inputsCustomizations = {
             },
             style: {
               height: "2.5rem", // 40px
+              [theme.breakpoints.down("md")]: {
+                minHeight: 44,
+              },
             },
           },
           {
@@ -266,6 +279,10 @@ const inputsCustomizations = {
               width: "2.25rem",
               height: "2.25rem",
               padding: "0.25rem",
+              [theme.breakpoints.down("md")]: {
+                width: 44,
+                height: 44,
+              },
               [`& .${svgIconClasses.root}`]: { fontSize: "1rem" },
             },
           },
@@ -276,6 +293,10 @@ const inputsCustomizations = {
             style: {
               width: "2.5rem",
               height: "2.5rem",
+              [theme.breakpoints.down("md")]: {
+                width: 44,
+                height: 44,
+              },
             },
           },
         ],

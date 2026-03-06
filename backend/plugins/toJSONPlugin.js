@@ -15,10 +15,7 @@ export const toJSONPlugin = (schema) => {
     virtuals: true,
     versionKey: false,
     transform(doc, ret, options) {
-      if (ret._id) {
-        ret.id = String(ret._id);
-        delete ret._id;
-      }
+      delete ret.id;
 
       privatePaths.forEach((pathName) => {
         delete ret[pathName];

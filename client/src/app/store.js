@@ -1,3 +1,6 @@
+/**
+ * @file Redux store and persistor bootstrap.
+ */
 import { configureStore } from "@reduxjs/toolkit";
 import {
   FLUSH,

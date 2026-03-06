@@ -8,26 +8,26 @@ import { predicates } from "./predicates.js";
 import { PERMISSION_MATRIX } from "./permissions.js";
 
 const SCOPE_CHECKS = Object.freeze({
-  organization: ({ actor, context }) =>
-    predicates.isSameOrganization({ actor, context }),
-  department: ({ actor, context }) =>
-    predicates.isSameOrganization({ actor, context }) &&
-    predicates.isSameDepartment({ actor, context }),
+  organization: ({ user, context }) =>
+    predicates.isSameOrganization({ user, context }),
+  department: ({ user, context }) =>
+    predicates.isSameOrganization({ user, context }) &&
+    predicates.isSameDepartment({ user, context }),
 });
 
 const OWNERSHIP_CHECKS = Object.freeze({
-  self: ({ actor, context }) => predicates.isSelf({ actor, context }),
+  self: ({ user, context }) => predicates.isSelf({ user, context }),
 });
 
 /**
  * Evaluates the centralized authorization matrix using OR semantics.
  *
- * @param {{ actor: Record<string, unknown>, resource: string, action: string, context?: Record<string, unknown> }} options - Authorization inputs.
+ * @param {{ user: Record<string, unknown>, resource: string, action: string, context?: Record<string, unknown> }} options - Authorization inputs.
  * @returns {boolean} Whether any rule grants access.
  * @throws {never} This helper does not throw.
  */
 export const evaluateAuthorization = ({
-  actor,
+  user,
   resource,
   action,
   context = {},
@@ -35,7 +35,7 @@ export const evaluateAuthorization = ({
   const rules = PERMISSION_MATRIX[resource]?.[action] || [];
 
   return rules.some((rule) => {
-    if (!rule.roles?.includes(actor?.role)) {
+    if (!rule.roles?.includes(user?.role)) {
       return false;
     }
 
@@ -44,7 +44,7 @@ export const evaluateAuthorization = ({
     if (
       predicateNames.some((predicateName) => {
         const predicate = predicates[predicateName];
-        return typeof predicate !== "function" || !predicate({ actor, context });
+        return typeof predicate !== "function" || !predicate({ user, context });
       })
     ) {
       return false;
@@ -53,7 +53,7 @@ export const evaluateAuthorization = ({
     if (rule.scope) {
       const scopeCheck = SCOPE_CHECKS[rule.scope];
 
-      if (typeof scopeCheck === "function" && !scopeCheck({ actor, context })) {
+      if (typeof scopeCheck === "function" && !scopeCheck({ user, context })) {
         return false;
       }
     }
@@ -63,7 +63,7 @@ export const evaluateAuthorization = ({
 
       if (
         typeof ownershipCheck === "function" &&
-        !ownershipCheck({ actor, context })
+        !ownershipCheck({ user, context })
       ) {
         return false;
       }
@@ -87,7 +87,7 @@ export const authorize = (resource, action, getContext) => (req, res, next) => {
     typeof getContext === "function" ? getContext(req) : req.permissionContext || {};
 
   const allowed = evaluateAuthorization({
-    actor: req.actor,
+    user: req.user,
     resource,
     action,
     context,

@@ -44,6 +44,53 @@ export const TASK_TYPE_VALUES = Object.freeze([
   "ROUTINE",
 ]);
 
+export const ERROR_TYPES = Object.freeze({
+  UNAUTHENTICATED_ERROR: "UNAUTHENTICATED_ERROR",
+  UNAUTHORIZED_ERROR: "UNAUTHORIZED_ERROR",
+  NOT_FOUND_ERROR: "NOT_FOUND_ERROR",
+  VALIDATION_ERROR: "VALIDATION_ERROR",
+  CONFLICT_ERROR: "CONFLICT_ERROR",
+  RATE_LIMITED_ERROR: "RATE_LIMITED_ERROR",
+  INTERNAL_ERROR: "INTERNAL_ERROR",
+});
+
+export const AUTH_COOKIE_NAMES = Object.freeze({
+  ACCESS_TOKEN: "accessToken",
+  REFRESH_TOKEN: "refreshToken",
+  CSRF_TOKEN: "csrfToken",
+});
+
+export const AUTH_HEADER_NAMES = Object.freeze({
+  CSRF: "x-csrf-token",
+});
+
+export const PERMISSION_RESOURCES = Object.freeze({
+  AUTH: "Auth",
+  ORG: "Org",
+  DEPARTMENT: "Department",
+  USER: "User",
+  TASK: "Task",
+  TASK_ACTIVITY: "TaskActivity",
+  COMMENT: "Comment",
+  ATTACHMENT: "Attachment",
+  MATERIAL: "Material",
+  VENDOR: "Vendor",
+  NOTIFICATION: "Notification",
+  DASHBOARD: "Dashboard",
+  SETTINGS: "Settings",
+  PLATFORM: "Platform",
+  SEARCH: "Search",
+});
+
+export const PERMISSION_ACTIONS = Object.freeze({
+  CREATE: "C",
+  READ: "R",
+  UPDATE: "U",
+  DELETE: "D",
+  RESTORE: "RS",
+  EXPORT: "X",
+});
+
 export const PAGE_SIZE = 10;
 
 export const LAYOUT_DIMENSIONS = Object.freeze({

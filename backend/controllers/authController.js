@@ -36,7 +36,7 @@ export const getCsrfToken = asyncHandler(async (req, res) => {
 });
 
 /**
- * Rotates the refresh session and returns the current actor snapshot.
+ * Rotates the refresh session and returns the current authenticated user snapshot.
  *
  * @returns {Promise<void>} Async controller completion.
  * @throws {Error} Propagates refresh-session failures.

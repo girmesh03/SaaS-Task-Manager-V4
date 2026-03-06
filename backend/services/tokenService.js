@@ -7,9 +7,9 @@ import { throwUnauthenticatedError } from "../utils/errorFactory.js";
 import { AUTH_COOKIE_NAMES } from "../utils/constants.js";
 
 /**
- * Creates a signed access token for the authenticated actor.
+ * Creates a signed access token for the authenticated user context.
  *
- * @param {{ userId: string, organizationId: string, departmentId?: string | null, role: string, isHod: boolean, isPlatformOrgUser: boolean }} payload - Actor claims.
+ * @param {{ user: { _id: string }, organization: { _id: string }, department?: { _id: string } | null, role: string, isHod: boolean, isPlatformOrgUser: boolean }} payload - User claims.
  * @returns {string} Signed JWT access token.
  * @throws {Error} Propagates signing failures.
  */
@@ -24,7 +24,7 @@ export const createAccessToken = (payload) => {
 /**
  * Creates a signed refresh token tied to a refresh session id.
  *
- * @param {{ sessionId: string, userId: string }} payload - Refresh claims.
+ * @param {{ session: { _id: string }, user: { _id: string } }} payload - Refresh claims.
  * @returns {string} Signed JWT refresh token.
  * @throws {Error} Propagates signing failures.
  */

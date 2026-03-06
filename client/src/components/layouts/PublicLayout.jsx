@@ -220,7 +220,7 @@ const PublicLayout = () => {
                   </Accordion>
                 ))}
                 <Typography variant="body2" color="text.secondary" align="center">
-                  © {new Date().getFullYear()} {APP_NAME}. All rights reserved.
+                  Copyright {new Date().getFullYear()} {APP_NAME}. All rights reserved.
                 </Typography>
               </Stack>
             ) : (
@@ -274,7 +274,7 @@ const PublicLayout = () => {
                 </Grid>
                 <Divider />
                 <Typography variant="body2" color="text.secondary" align="center">
-                  © {new Date().getFullYear()} {APP_NAME}. All rights reserved.
+                  Copyright {new Date().getFullYear()} {APP_NAME}. All rights reserved.
                 </Typography>
               </Stack>
             )}

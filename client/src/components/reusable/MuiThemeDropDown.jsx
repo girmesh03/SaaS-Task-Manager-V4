@@ -1,3 +1,6 @@
+/**
+ * @file Theme mode dropdown component.
+ */
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useColorScheme } from "@mui/material/styles";
@@ -12,6 +15,13 @@ import SettingsSuggestRoundedIcon from "@mui/icons-material/SettingsSuggestRound
 
 import { setThemeMode } from "../../app/slices/preferencesSlice";
 
+/**
+ * Theme mode dropdown component.
+ *
+ * @param {Record<string, unknown>} props - Icon button props.
+ * @returns {JSX.Element} Theme mode dropdown element.
+ * @throws {never} This component does not throw.
+ */
 const MuiThemeDropDown = (props) => {
   const dispatch = useDispatch();
   const { mode, systemMode, setMode } = useColorScheme();
