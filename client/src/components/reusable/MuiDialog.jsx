@@ -18,6 +18,7 @@ import { useTheme } from "@mui/material/styles";
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
+Transition.displayName = "MuiDialogTransition";
 
 /**
  * Dialog wrapper with responsive mobile behavior.

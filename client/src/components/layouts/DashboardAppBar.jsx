@@ -5,6 +5,7 @@ import { memo } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
@@ -12,6 +13,9 @@ import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import WifiRoundedIcon from "@mui/icons-material/WifiRounded";
+import WifiOffRoundedIcon from "@mui/icons-material/WifiOffRounded";
+
 import { MuiThemeDropDown } from "../reusable";
 import { LAYOUT_DIMENSIONS } from "../../utils/constants";
 import NotificationsMenu from "./NotificationsMenu";
@@ -26,12 +30,15 @@ import UserMenu from "./UserMenu";
  *   onOpenSearch: () => void;
  *   unreadCount: number;
  *   notificationsDisabled?: boolean;
+ *   onViewAllNotifications?: () => void;
  *   user: {
  *     id: string | null;
  *     fullName: string;
  *     email: string;
  *     avatarUrl: string;
  *   } | null;
+ *   isPlatformSuperAdmin?: boolean;
+ *   isConnected?: boolean;
  * }} props - Component props.
  * @returns {JSX.Element} Rendered app bar.
  * @throws {never} This component does not throw.
@@ -42,11 +49,12 @@ const DashboardAppBar = ({
   onOpenSearch,
   unreadCount,
   notificationsDisabled = false,
+  onViewAllNotifications,
   user,
+  isPlatformSuperAdmin = false,
+  isConnected = false,
 }) => {
   const isBelow768 = useMediaQuery("(max-width:767.95px)");
-
-  const bellUnreadCount = notificationsDisabled ? 0 : unreadCount;
 
   return (
     <AppBar
@@ -79,11 +87,30 @@ const DashboardAppBar = ({
           <MenuIcon />
         </IconButton>
 
-        <Typography variant="h6" sx={{ fontWeight: 700, minWidth: 120 }}>
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: 700,
+            minWidth: 120,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
           {title}
         </Typography>
 
         <Box sx={{ flexGrow: 1 }} />
+
+        {!isBelow768 ? (
+          <Chip
+            size="small"
+            color={isConnected ? "success" : "default"}
+            icon={isConnected ? <WifiRoundedIcon /> : <WifiOffRoundedIcon />}
+            label={isConnected ? "Live" : "Offline"}
+            variant="outlined"
+          />
+        ) : null}
 
         {isBelow768 ? (
           <Tooltip title="Global search">
@@ -109,8 +136,9 @@ const DashboardAppBar = ({
         <MuiThemeDropDown />
 
         <NotificationsMenu
-          unreadCount={bellUnreadCount}
+          unreadCount={notificationsDisabled ? 0 : unreadCount}
           disabled={notificationsDisabled}
+          onViewAll={onViewAllNotifications}
         />
 
         <UserMenu
@@ -120,6 +148,7 @@ const DashboardAppBar = ({
             email: user?.email || "",
             avatarUrl: user?.avatarUrl || "",
           }}
+          isPlatformSuperAdmin={isPlatformSuperAdmin}
         />
       </Toolbar>
     </AppBar>

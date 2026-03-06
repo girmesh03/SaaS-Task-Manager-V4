@@ -5,9 +5,11 @@
 
 export * from "./CustomIcons";
 export { default as MuiBackdrop } from "./MuiBackdrop";
+export { default as MuiDataGrid } from "./MuiDataGrid";
 export { default as MuiDialog } from "./MuiDialog";
 export { default as MuiDialogConfirm } from "./MuiDialogConfirm";
 export { default as MuiEmptyState } from "./MuiEmptyState";
+export { default as MuiFileDropzone } from "./MuiFileDropzone";
 export { default as MuiLoading } from "./MuiLoading";
 export { default as MuiTextField } from "./MuiTextField";
 export { default as MuiThemeDropDown } from "./MuiThemeDropDown";

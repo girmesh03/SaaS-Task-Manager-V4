@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
 import { RouterProvider } from "react-router";
 
@@ -16,16 +17,22 @@ import AppTheme from "./theme/AppTheme";
 
 import routes from "./router/routes";
 import { ErrorBoundary } from "./components/common";
+import { persistor, store } from "./app/store";
+import { MuiLoading } from "./components/reusable";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <AppTheme>
-        <CssBaseline enableColorScheme />
-        <ErrorBoundary>
-          <RouterProvider router={routes} />
-        </ErrorBoundary>
-      </AppTheme>
-    </LocalizationProvider>
+    <Provider store={store}>
+      <PersistGate loading={<MuiLoading fullScreen message="Loading workspace..." />} persistor={persistor}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <AppTheme>
+            <CssBaseline enableColorScheme />
+            <ErrorBoundary>
+              <RouterProvider router={routes} />
+            </ErrorBoundary>
+          </AppTheme>
+        </LocalizationProvider>
+      </PersistGate>
+    </Provider>
   </StrictMode>
 );

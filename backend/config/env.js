@@ -359,6 +359,11 @@ const buildValidatedEnv = () => {
     type: "int",
     min: 1,
   });
+  const SOFT_DELETE_RETENTION_DAYS = read("SOFT_DELETE_RETENTION_DAYS", {
+    type: "int",
+    defaultValue: ENV_DEFAULTS.SOFT_DELETE_RETENTION_DAYS,
+    min: 1,
+  });
 
   if (issues.length > 0) {
     throw new EnvValidationError(issues);
@@ -418,6 +423,7 @@ const buildValidatedEnv = () => {
     CLOUDINARY_API_SECRET,
     ATTACHMENTS_TTL_DAYS,
     NOTIFICATIONS_TTL_DAYS,
+    SOFT_DELETE_RETENTION_DAYS,
     APP_NAME,
     AUTH_COOKIE_OPTIONS,
     CSRF_COOKIE_OPTIONS,

@@ -1,87 +1,90 @@
-/**
- * NotFound Component - 404 Error Page
- *
- * Displayed when user navigates to a non-existent route.
- * Uses the notFound_404.svg asset for visual appeal.
- *
- */
+import { isRouteErrorResponse, useNavigate, useRouteError } from "react-router";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 
-import { useNavigate } from "react-router";
-import { Box, Typography, Button, Container } from "@mui/material";
-import { Home as HomeIcon, Login as LoginIcon } from "@mui/icons-material";
 import notFoundSvg from "../../assets/notFound_404.svg";
 
-const NotFound = () => {
-  const navigate = useNavigate();
-  const isAuthenticated = false;
+const getErrorDetails = (error) => {
+  if (isRouteErrorResponse(error)) {
+    return {
+      title: error.status === 404 ? "Page Not Found" : "Route Error",
+      message: error.data?.message || error.statusText || "Unable to load this page.",
+      statusLabel: `${error.status}`,
+    };
+  }
 
-  const handleGoBack = () => {
-    if (isAuthenticated) {
-      navigate("/dashboard");
-    } else {
-      navigate("/login");
-    }
+  if (error instanceof Error) {
+    return {
+      title: "Route Error",
+      message: error.message,
+      statusLabel: error.name || "Error",
+    };
+  }
+
+  return {
+    title: "Route Error",
+    message: "Unable to load this page.",
+    statusLabel: "Error",
   };
+};
+
+/**
+ * Route-level error renderer used by the router.
+ *
+ * @returns {JSX.Element} Route error UI.
+ * @throws {never} This component does not throw.
+ */
+const RouteError = () => {
+  const navigate = useNavigate();
+  const routeError = useRouteError();
+  const { title, message, statusLabel } = getErrorDetails(routeError);
 
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "80vh",
-          textAlign: "center",
-          py: 4,
-        }}
-      >
-        {/* SVG Illustration */}
+    <Box
+      sx={{
+        minHeight: "80vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        px: 2,
+      }}
+    >
+      <Stack spacing={2} alignItems="center" textAlign="center" maxWidth={480}>
         <Box
           component="img"
           src={notFoundSvg}
-          alt="Page not found"
+          alt={title}
           sx={{
             width: "100%",
-            maxWidth: 400,
+            maxWidth: 320,
             height: "auto",
-            mb: 4,
           }}
         />
-
-        {/* Error Message */}
-        <Typography
-          variant="h3"
-          component="h1"
-          fontWeight={700}
-          color="primary.main"
-          gutterBottom
-        >
-          Page Not Found
+        <Typography variant="overline" color="text.secondary">
+          {statusLabel}
         </Typography>
-
-        <Typography
-          variant="body1"
-          color="text.secondary"
-          sx={{ maxWidth: 400 }}
-        >
-          Oops! The page you are looking for does not exist or has been moved.
-          Please check the URL or navigate back to a known page.
+        <Typography variant="h4" sx={{ fontWeight: 700 }}>
+          {title}
         </Typography>
-
-        {/* Action Button */}
-        <Button
-          variant="contained"
-          size="small" // Set to small as requested
-          onClick={handleGoBack}
-          startIcon={isAuthenticated ? <HomeIcon /> : <LoginIcon />}
-          sx={{ mt: 2 }}
-        >
-          Login
-        </Button>
-      </Box>
-    </Container>
+        <Typography variant="body2" color="text.secondary">
+          {message}
+        </Typography>
+        <Stack direction="row" spacing={1}>
+          <Button size="small" variant="contained" onClick={() => window.location.reload()}>
+            Retry
+          </Button>
+          <Button size="small" variant="outlined" onClick={() => navigate("/")}>
+            Home
+          </Button>
+          <Button size="small" variant="text" onClick={() => navigate(-1)}>
+            Back
+          </Button>
+        </Stack>
+      </Stack>
+    </Box>
   );
 };
 
-export default NotFound;
+export default RouteError;

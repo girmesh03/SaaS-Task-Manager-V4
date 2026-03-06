@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import PropTypes from "prop-types";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 import {
@@ -48,9 +47,5 @@ function AppTheme(props) {
     </ThemeProvider>
   );
 }
-
-AppTheme.propTypes = {
-  children: PropTypes.node,
-};
 
 export default AppTheme;

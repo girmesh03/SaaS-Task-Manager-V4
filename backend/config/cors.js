@@ -2,7 +2,7 @@ import cors from "cors";
 
 import { getEnv } from "./env.js";
 import {
-  API_MESSAGES_EXTENDED,
+  API_MESSAGES,
   ERROR_TYPES,
   SECURITY_CONSTANTS,
 } from "../utils/constants.js";
@@ -27,14 +27,14 @@ export const corsMiddleware = () => {
         return;
       }
 
-      const error = new Error(API_MESSAGES_EXTENDED.CORS_ORIGIN_NOT_ALLOWED);
+      const error = new Error(API_MESSAGES.CORS_ORIGIN_NOT_ALLOWED);
       error.status = 403;
       error.statusCode = 403;
       error.type = ERROR_TYPES.UNAUTHORIZED_ERROR;
       error.details = [
         {
           field: "origin",
-          message: API_MESSAGES_EXTENDED.CORS_ORIGIN_NOT_ALLOWED,
+          message: API_MESSAGES.CORS_ORIGIN_NOT_ALLOWED,
         },
       ];
       callback(error);

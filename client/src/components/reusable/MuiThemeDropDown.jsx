@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useColorScheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -7,8 +8,12 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import DarkModeIcon from "@mui/icons-material/DarkModeRounded";
 import LightModeIcon from "@mui/icons-material/LightModeRounded";
+import SettingsSuggestRoundedIcon from "@mui/icons-material/SettingsSuggestRounded";
+
+import { setThemeMode } from "../../app/slices/preferencesSlice";
 
 const MuiThemeDropDown = (props) => {
+  const dispatch = useDispatch();
   const { mode, systemMode, setMode } = useColorScheme();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -23,10 +28,10 @@ const MuiThemeDropDown = (props) => {
 
   const handleMode = (targetMode) => () => {
     setMode(targetMode);
+    dispatch(setThemeMode(targetMode));
     handleClose();
   };
 
-  // If no mode
   if (!mode) {
     return (
       <Box
@@ -44,14 +49,7 @@ const MuiThemeDropDown = (props) => {
     );
   }
 
-  // Get the current theme
   const resolvedMode = systemMode || mode;
-
-  // Assign icon based on the theme
-  // const icon = {
-  //   light: <LightModeIcon />,
-  //   dark: <DarkModeIcon />,
-  // }[resolvedMode];
 
   return (
     <React.Fragment>
@@ -133,9 +131,7 @@ const MuiThemeDropDown = (props) => {
               width: "100%",
             }}
           >
-            <Box sx={{ fontSize: "1.1rem", display: "flex", opacity: 0.8 }}>
-              🌓
-            </Box>
+            <SettingsSuggestRoundedIcon fontSize="small" sx={{ opacity: 0.8 }} />
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
               System
             </Typography>

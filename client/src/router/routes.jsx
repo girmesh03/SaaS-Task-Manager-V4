@@ -7,7 +7,7 @@ import {
   PublicLayout,
   DashboardLayout,
 } from "../components/layouts";
-import { ErrorBoundary } from "../components/common";
+import { ProtectedRoute, RouteError } from "../components/common";
 import { MuiLoading } from "../components/reusable";
 
 /**
@@ -29,11 +29,12 @@ const routes = createBrowserRouter([
   {
     path: "/",
     Component: RootLayout,
-    ErrorBoundary: ErrorBoundary,
+    ErrorBoundary: RouteError,
     HydrateFallback: MuiLoading,
     children: [
       {
         Component: PublicLayout,
+        ErrorBoundary: RouteError,
         children: [
           {
             index: true,
@@ -63,69 +64,71 @@ const routes = createBrowserRouter([
       },
       {
         path: "dashboard",
-        Component: DashboardLayout,
+        Component: ProtectedRoute,
         children: [
           {
-            index: true,
-            lazy: lazyPage(() => import("../pages/protected/DashboardPage")),
-          },
-          {
-            path: "tasks",
-            lazy: lazyPage(() => import("../pages/protected/TasksPage")),
-          },
-          {
-            path: "tasks/:taskId",
-            lazy: lazyPage(() => import("../pages/protected/TaskDetailsPage")),
-          },
-          {
-            path: "users",
-            lazy: lazyPage(() => import("../pages/protected/UsersPage")),
-          },
-          {
-            path: "users/:userId",
-            lazy: lazyPage(() => import("../pages/protected/UserDetailsPage")),
-          },
-          {
-            path: "users/:userId",
-            lazy: lazyPage(() => import("../pages/protected/UserDetailsPage")),
-          },
-          {
-            path: "users/:userId/settings",
-            lazy: lazyPage(() => import("../pages/protected/UserSettingsPage")),
-          },
-          {
-            path: "departments",
-            lazy: lazyPage(() => import("../pages/protected/DepartmentsPage")),
-          },
-          {
-            path: "departments/:departmentId",
-            lazy: lazyPage(() =>
-              import("../pages/protected/DepartmentDetailsPage")
-            ),
-          },
-          {
-            path: "materials",
-            lazy: lazyPage(() => import("../pages/protected/MaterialsPage")),
-          },
-          {
-            path: "materials/:materialId",
-            lazy: lazyPage(() =>
-              import("../pages/protected/MaterialDetailsPage")
-            ),
-          },
-          {
-            path: "vendors",
-            lazy: lazyPage(() => import("../pages/protected/VendorsPage")),
-          },
-          {
-            path: "vendors/:vendorId",
-            lazy: lazyPage(() =>
-              import("../pages/protected/VendorDetailsPage")
-            ),
-          },
-          {
-            path: "settings",
-            lazy: lazyPage(() => import("../pages/protected/OrgSettingsPage")),
+            Component: DashboardLayout,
+            ErrorBoundary: RouteError,
+            children: [
+              {
+                index: true,
+                lazy: lazyPage(() => import("../pages/protected/DashboardPage")),
+              },
+              {
+                path: "tasks",
+                lazy: lazyPage(() => import("../pages/protected/TasksPage")),
+              },
+              {
+                path: "tasks/:taskId",
+                lazy: lazyPage(() => import("../pages/protected/TaskDetailsPage")),
+              },
+              {
+                path: "users",
+                lazy: lazyPage(() => import("../pages/protected/UsersPage")),
+              },
+              {
+                path: "users/:userId",
+                lazy: lazyPage(() => import("../pages/protected/UserDetailsPage")),
+              },
+              {
+                path: "users/:userId/settings",
+                lazy: lazyPage(() => import("../pages/protected/UserSettingsPage")),
+              },
+              {
+                path: "departments",
+                lazy: lazyPage(() => import("../pages/protected/DepartmentsPage")),
+              },
+              {
+                path: "departments/:departmentId",
+                lazy: lazyPage(() =>
+                  import("../pages/protected/DepartmentDetailsPage")
+                ),
+              },
+              {
+                path: "materials",
+                lazy: lazyPage(() => import("../pages/protected/MaterialsPage")),
+              },
+              {
+                path: "materials/:materialId",
+                lazy: lazyPage(() =>
+                  import("../pages/protected/MaterialDetailsPage")
+                ),
+              },
+              {
+                path: "vendors",
+                lazy: lazyPage(() => import("../pages/protected/VendorsPage")),
+              },
+              {
+                path: "vendors/:vendorId",
+                lazy: lazyPage(() =>
+                  import("../pages/protected/VendorDetailsPage")
+                ),
+              },
+              {
+                path: "settings",
+                lazy: lazyPage(() => import("../pages/protected/OrgSettingsPage")),
+              },
+            ],
           },
         ],
       },

@@ -2,7 +2,6 @@
  * @file Generic route placeholder component.
  */
 import { useState } from "react";
-import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
@@ -86,13 +85,6 @@ const RoutePlaceholder = ({
       </MuiDialog>
     </Stack>
   );
-};
-
-RoutePlaceholder.propTypes = {
-  title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  routePath: PropTypes.string.isRequired,
-  minimal: PropTypes.bool,
 };
 
 export default RoutePlaceholder;

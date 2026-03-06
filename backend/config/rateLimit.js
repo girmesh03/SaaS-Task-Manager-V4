@@ -2,7 +2,7 @@ import rateLimit from "express-rate-limit";
 
 import { getEnv } from "./env.js";
 import {
-  API_MESSAGES_EXTENDED,
+  API_MESSAGES,
   API_STATUS_CODES,
   ERROR_TYPES,
   RATE_LIMIT_DEFAULTS,
@@ -81,7 +81,7 @@ export const createRateLimitMiddleware = ({ windowMs, limit }) =>
     handler(req, res) {
       res.status(API_STATUS_CODES.TOO_MANY_REQUESTS).json({
         success: false,
-        message: API_MESSAGES_EXTENDED.RATE_LIMITED,
+        message: API_MESSAGES.RATE_LIMITED,
         error: {
           type: ERROR_TYPES.RATE_LIMITED_ERROR,
           statusCode: API_STATUS_CODES.TOO_MANY_REQUESTS,

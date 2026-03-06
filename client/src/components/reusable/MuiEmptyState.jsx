@@ -23,7 +23,6 @@
  */
 
 import { createElement, memo } from "react";
-import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -106,15 +105,6 @@ const MuiEmptyState = ({
       )}
     </Box>
   );
-};
-
-MuiEmptyState.propTypes = {
-  message: PropTypes.string,
-  secondaryMessage: PropTypes.string,
-  icon: PropTypes.elementType, // Component function only (not pre-rendered element)
-  actionLabel: PropTypes.string,
-  onAction: PropTypes.func,
-  sx: PropTypes.object,
 };
 
 export default memo(MuiEmptyState);

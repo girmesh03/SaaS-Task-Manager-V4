@@ -1,12 +1,19 @@
 /**
  * @file Global client-side error boundary wrapper.
  */
-import PropTypes from "prop-types";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+
+const deriveErrorType = (error) => {
+  if (error && typeof error === "object") {
+    return error.error?.type || error.name || "UnknownError";
+  }
+
+  return "UnknownError";
+};
 
 /**
  * Boundary fallback content.
@@ -16,6 +23,7 @@ import Typography from "@mui/material/Typography";
  */
 const Fallback = ({ error, resetErrorBoundary }) => {
   const message = error instanceof Error ? error.message : "Unexpected error";
+  const errorType = deriveErrorType(error);
 
   return (
     <Box
@@ -31,20 +39,27 @@ const Fallback = ({ error, resetErrorBoundary }) => {
         <Typography variant="h5" sx={{ fontWeight: 700 }}>
           Something went wrong
         </Typography>
+        <Typography variant="caption" color="text.secondary">
+          {errorType}
+        </Typography>
         <Typography variant="body2" color="text.secondary">
           {message}
         </Typography>
-        <Button size="small" variant="contained" onClick={resetErrorBoundary}>
-          Try Again
-        </Button>
+        <Stack direction="row" spacing={1}>
+          <Button size="small" variant="contained" onClick={resetErrorBoundary}>
+            Try Again
+          </Button>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => window.location.assign("/")}
+          >
+            Home
+          </Button>
+        </Stack>
       </Stack>
     </Box>
   );
-};
-
-Fallback.propTypes = {
-  error: PropTypes.oneOfType([PropTypes.instanceOf(Error), PropTypes.object]),
-  resetErrorBoundary: PropTypes.func.isRequired,
 };
 
 /**
@@ -59,10 +74,6 @@ const ErrorBoundary = ({ children }) => {
       {children}
     </ReactErrorBoundary>
   );
-};
-
-ErrorBoundary.propTypes = {
-  children: PropTypes.node,
 };
 
 export default ErrorBoundary;

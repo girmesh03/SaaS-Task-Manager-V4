@@ -4,7 +4,6 @@
  */
 
 import { memo } from "react";
-import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import MuiDialog from "./MuiDialog";
@@ -72,25 +71,5 @@ const MuiDialogConfirm = memo(
     );
   }
 );
-
-MuiDialogConfirm.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onConfirm: PropTypes.func,
-  title: PropTypes.string,
-  message: PropTypes.string,
-  confirmText: PropTypes.string,
-  cancelText: PropTypes.string,
-  confirmColor: PropTypes.oneOf([
-    "inherit",
-    "primary",
-    "secondary",
-    "success",
-    "error",
-    "info",
-    "warning",
-  ]),
-  isLoading: PropTypes.bool,
-};
 
 export default MuiDialogConfirm;

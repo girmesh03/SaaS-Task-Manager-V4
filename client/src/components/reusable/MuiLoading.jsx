@@ -27,7 +27,6 @@
  */
 
 import { memo } from "react";
-import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
@@ -115,21 +114,6 @@ const MuiLoading = ({
       )}
     </Box>
   );
-};
-
-MuiLoading.propTypes = {
-  message: PropTypes.string,
-  size: PropTypes.number,
-  color: PropTypes.oneOf([
-    "primary",
-    "secondary",
-    "error",
-    "info",
-    "success",
-    "warning",
-    "inherit",
-  ]),
-  fullScreen: PropTypes.bool,
 };
 
 export default memo(MuiLoading);
